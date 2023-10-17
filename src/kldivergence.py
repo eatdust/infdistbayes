@@ -44,3 +44,22 @@ def kl_integrand(x,p,q,inbit):
         else:
             return p(x)*np.log(p(x)/q(x))
 
+
+def kullback_leibler_second_moment(p,q,bounds,inbit=True):
+    tol = 1e-3
+    args=(p,q,inbit)
+    KL2,err = integrate.quad(kl_second_moment_integrand,bounds[0],bounds[1],args,limit=1000,epsabs=tol,epsrel=tol)
+    if (err > tol):
+        print('kullback_leibler_second_moment KL^2= error=: ',KL2,err)
+    return KL2
+
+
+def kl_second_moment_integrand(x,p,q,inbit):
+    if p(x) <= 0 or q(x) <= 0:
+#        print('x= p(x)= q(x)= ',x,p(x))
+        return 0.0
+    else:
+        if inbit:
+            return p(x)*( np.log2(p(x)/q(x)) )**2
+        else:
+            return p(x)*( np.log(p(x)/q(x)) )**2

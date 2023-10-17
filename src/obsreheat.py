@@ -109,6 +109,7 @@ else:
 
 n = 0
 kldiv = []
+kldim = []
 bayesfactor = []
 proba = []
 norm = 0.0
@@ -166,8 +167,11 @@ for i in range(bayesdist.shape[0]):
   xmax = min(max(xprior),max(xpost))
 
   print('xmin= xmax= ',xmin,xmax)
-  
-  kldiv.append(kl.kullback_leibler(p,q,(xmin,xmax)))
+
+  Imean = kl.kullback_leibler(p,q,(xmin,xmax))
+  I2mean = kl.kullback_leibler_second_moment(p,q,(xmin,xmax))
+  kldiv.append(Imean)
+  kldim.append(2.0*(I2mean - Imean*Imean))
 
   Bfactor = bayesdist['Evidence'][i]-bayesmax
   expBfactor = np.exp(Bfactor)
@@ -177,6 +181,7 @@ for i in range(bayesdist.shape[0]):
   norm += expBfactor
 
   print('KL=  ',kldiv[n])
+  print('d=   ',kldim[n])
   print('lnB= ',bayesfactor[n])
   print('Param is: ',param)
   print('Best= Mean= ',best[n],mean[n])
@@ -190,20 +195,28 @@ proba = proba/norm
 
 kldivMean = 0.0
 kldivVar = 0.0
+kldimMean = 0.0
+kldimVar = 0.0
 cumul  = 0.0
 
 for n in range(nmodel):
   cumul +=proba[n]
   kldivMean = kldivMean + proba[n]*kldiv[n]
   kldivVar = kldivVar + proba[n]*kldiv[n]*kldiv[n]
-  
+  kldimMean = kldimMean + proba[n]*kldim[n]
+  kldimVar = kldimVar + proba[n]*kldim[n]*kldim[n]
+
 kldivVar = kldivVar - kldivMean**2
+kldimVar = kldimVar - kldimMean**2
 
 print()
 print('================================================================')
 print('<Dkl>= ',kldivMean)
 print('sqrt[<Dkl^2> - <Dkl>^2]= ',np.sqrt(kldivVar))
 print('min(Dkl)= max(Dkl)= ',min(kldiv),max(kldiv))
+print('<d>= ',kldimMean)
+print('sqrt[<d^2> - <d>^2]= ',np.sqrt(kldimVar))
+print('min(d)= max(d)= ',min(kldim),max(kldim))
 print('================================================================')
 
 ############################################################################
