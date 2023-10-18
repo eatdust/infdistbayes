@@ -1,6 +1,6 @@
 #   This file is part of infdistbayes
 #
-#   Copyright (C) 2021 C. Ringeval
+#   Copyright (C) 2021-2023 C. Ringeval
 #   
 #   infdistbayes is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 import numpy as np
 from scipy import integrate
 
-def load_bayesdist(filename):
-    disttype = np.dtype([('Name', np.unicode_, 60),
+def load_bayesdist(filename,oldtype=False):
+    distoldtype = np.dtype([('Name', np.unicode_, 60),
                      ('Nparams',np.dtype(int)),
                      ('Evidence',np.dtype(float)),
                      ('Error',np.dtype(float)),
@@ -27,9 +27,20 @@ def load_bayesdist(filename):
                      ('NparamsMinusComp',np.dtype(float)),
                      ('Best',np.dtype(float))])
 
-
+    disttype = np.dtype([('Name', np.unicode_, 60),
+                     ('Nparams',np.dtype(int)),
+                     ('Evidence',np.dtype(float)),
+                     ('Error',np.dtype(float)),
+                     ('DKL',np.dtype(float)),
+                     ('Dimension',np.dtype(float)),
+                     ('NparamsMinusDim',np.dtype(float)),
+                     ('Best',np.dtype(float))])
     
-    bayesdist = np.loadtxt(filename,dtype=disttype)
+    
+    if oldtype:
+        bayesdist = np.loadtxt(filename,dtype=distoldtype)
+    else:
+        bayesdist = np.loadtxt(filename,dtype=disttype)
 
     if (bayesdist.ndim == 0):
         bayesdist = np.reshape(bayesdist,1)
