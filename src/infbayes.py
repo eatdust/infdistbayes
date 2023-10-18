@@ -133,7 +133,7 @@ print('Getting extrastats...')
 deltamean = 2.0*(likestats.meanLogLike - likestats.logMeanLike)
 extraname = outstatdir+rootname+'_extrastats'
 print('complexity =',likestats.complexity,file=open(extraname,'w'))
-print('dimensionality =',likestats.dimensionality,file=open(extraname,'w'))
+print('dimensionality =',2*likestats.varLogLike,file=open(extraname,'w'))
 print('deltamean =',deltamean,file=open(extraname,'a'))
 print('D_KL (bits) = ',bayestats.D_KL/math.log(2),file=open(extraname,'a'))
 print('d_G = ',bayestats.d_G,file=open(extraname,'a'))
