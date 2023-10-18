@@ -159,34 +159,32 @@ function spawndist()
     echo 'running' $EXECDIST $modelname '(pid '$infbayespid')'    
     wait
 
-#get complexity
-    complexity=`grep "complexity" $STATDIR/$PREFIX$modelname'_extrastats' \
+#get dimensionality or complexity
+    if [ $whichD == 1 ]; then
+	dimensionality=`grep "dimensionality" $STATDIR/$PREFIX$modelname'_extrastats' \
+	|sed 's|dimensionality =||g' | awk '{print $1 + 0.0}'`
+    else
+	dimensionality=`grep "complexity" $STATDIR/$PREFIX$modelname'_extrastats' \
     	|sed 's|complexity =||g' | awk '{print $1 + 0.0}'`
+    fi
 
-#get dimensionality
-    dimensionality=`grep "dimensionality" $STATDIR/$PREFIX$modelname'_extrastats' \
-    	|sed 's|dimensionality =||g' | awk '{print $1 + 0.0}'`
+#get Kullback-Leibler divergence in bits
+    infogain=`grep "D_KL (bits)" $STATDIR/$PREFIX$modelname'_extrastats' \
+    	|sed 's|D_KL (bits) =||g' | awk '{print $1 + 0.0}'`
     
 #derived unconstrained params
-    if [ $whichD == 1 ]; then
-	nunconsparams=`echo $nfreeparams $dimensionality | awk '{print $1 - $2}'`
-    else
-	nunconsparams=`echo $nfreeparams $complexity | awk '{print $1 - $2}'`
-    fi
+    nunconsparams=`echo $nfreeparams $dimensionality | awk '{print $1 - $2}'`
 
 #get best +ln(like)
     bestfit=`grep "Best fit sample" $STATDIR/$PREFIX$modelname'_likestats' \
         | sed 's|Best fit sample -log(Like) =||g' | awk '{print -$1 + 0.0}'`
 
 #dump in output file
-    if [ $whichD == 1 ]; then
-	collect="$modelname $nfreeparams $evidence $error $dimensionality $nunconsparams $bestfit"
-    else
-	collect="$modelname $nfreeparams $evidence $error $complexity $nunconsparams $bestfit"
-    fi
+
+    collect="$modelname $nfreeparams $evidence $error $infogain $dimensionality $nunconsparams $bestfit"
 
     echo $collect \
-	| awk '{ printf "%-12s %-12s %-12s %-12s %-12s %-12s %-12s \n",$1,$2,$3,$4,$5,$6,$7 }' \
+	| awk '{ printf "%-12s %-12s %-12s %-12s %-12s %-12s %-12s %-12s \n",$1,$2,$3,$4,$5,$6,$7,$8 }' \
 	      >> $OUTFILE
 }
 
@@ -215,15 +213,9 @@ namelist=`echo $statlist | sed 's|'$CHAINDIR/$PREFIX'||g' \
 | sed 's|'$SUFFIX'||g'`
 
 #add a header to the output file
-if [ $whichD == 1 ]; then
-    echo '#Name #Nparams #Evidence #Error #Dimension  #Npars-Ndim  #Best' \
-	| awk '{ printf "%-12s %-12s %-12s %-12s %-12s %-12s %-12s \n",$1,$2,$3,$4,$5,$6,$7 }' \
-	      > $OUTFILE
-else
-    echo '#Name #Nparams #Evidence #Error #Complexity  #Npars-Comp.  #Best' \
-	| awk '{ printf "%-12s %-12s %-12s %-12s %-12s %-12s %-12s \n",$1,$2,$3,$4,$5,$6,$7 }' \
-	      > $OUTFILE
-fi
+echo '#Name #Nparams #Evidence #Error #DKL(bits) #Dimension  #Npars-Ndim  #Best' \
+    | awk '{ printf "%-12s %-12s %-12s %-12s %-12s %-12s %-12s %-12s \n",$1,$2,$3,$4,$5,$6,$7,$8 }' \
+	  > $OUTFILE
 
 count=0
 for x in $namelist

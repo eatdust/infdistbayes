@@ -1,6 +1,6 @@
 #   This file is part of infdistbayes
 #
-#   Copyright (C) 2021 C. Ringeval
+#   Copyright (C) 2021-2023 C. Ringeval
 #   
 #   infdistbayes is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -18,8 +18,10 @@
 #!/usr/bin/python
 import getdist.plots as gp
 import getdist.mcsamples as gm
+import anesthetic as an
 import iobayes as iob
 import argparse
+import math as math
 #import aspicdist as ad
 
 
@@ -89,7 +91,12 @@ if mc.sampler == 'nested' or mc.sampler == 'polychord':
     mc.loglikes = mc.loglikes/2.0
     mc.updateBaseStatistics()
 
-    
+
+#we get the Kullback-Leibler divergence from anesthetic (which
+#automagically detect the type of chains)
+an = an.read_chains(root=chaindirname+rootname)
+
+
 #### stats
 
 print(mc.getNumSampleSummaryText())
@@ -110,14 +117,26 @@ likename = outstatdir+rootname+'_likestats'
 print('saved as: ',likename)
 print(likestats,file=open(likename, 'w'))
 
+print('Getting bayestats...')
+bayestats = an.stats()
+bayesname = outstatdir+rootname+'_bayestats'
+print('saved as: ',bayesname)
+print(bayestats,file=open(bayesname, 'w'))
+
+print('Getting extrastats...')
+
 #the maxlike is hardly well determined, we can define a complexity
 #from the log(meanlike) that traces the highest values of the
-#likelihood only
+#likelihood only. The dimensionality is another pure Bayesian way to
+#estimate the number of constrained parameters, it is weekly sensitive
+#to the prior
 deltamean = 2.0*(likestats.meanLogLike - likestats.logMeanLike)
 extraname = outstatdir+rootname+'_extrastats'
 print('complexity =',likestats.complexity,file=open(extraname,'w'))
 print('dimensionality =',likestats.dimensionality,file=open(extraname,'w'))
 print('deltamean =',deltamean,file=open(extraname,'a'))
+print('D_KL (bits) = ',bayestats.D_KL/math.log(2),file=open(extraname,'a'))
+print('d_G = ',bayestats.d_G,file=open(extraname,'a'))
 print('saved as: ',extraname)
 
 
