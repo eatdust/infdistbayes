@@ -1,6 +1,6 @@
 #   This file is part of infdistbayes
 #
-#   Copyright (C) 2021 C. Ringeval
+#   Copyright (C) 2021-2023 C. Ringeval
 #   
 #   infdistbayes is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@ export EXECDIR=$CURRENTDIR/'src/'
 
 #compute marginalized distribution for these parameters
 export DATAPARAMLIST='lnRreh'
+
+#use Bayesian Model Complexity (0) or Bayesian Model Dimensionality (1)
+whichD=1
 
 export OUTDIR='./output'
 export OUTFILE='bayesdist.log'
@@ -159,19 +162,32 @@ function spawndist()
 #get complexity
     complexity=`grep "complexity" $STATDIR/$PREFIX$modelname'_extrastats' \
     	|sed 's|complexity =||g' | awk '{print $1 + 0.0}'`
-#derived unconstrained params
-    nunconsparams=`echo $nfreeparams $complexity | awk '{print $1 - $2}'`
+
+#get dimensionality
+    dimensionality=`grep "dimensionality" $STATDIR/$PREFIX$modelname'_extrastats' \
+    	|sed 's|dimensionality =||g' | awk '{print $1 + 0.0}'`
     
+#derived unconstrained params
+    if [ $whichD == 1 ]; then
+	nunconsparams=`echo $nfreeparams $dimensionality | awk '{print $1 - $2}'`
+    else
+	nunconsparams=`echo $nfreeparams $complexity | awk '{print $1 - $2}'`
+    fi
+
 #get best +ln(like)
     bestfit=`grep "Best fit sample" $STATDIR/$PREFIX$modelname'_likestats' \
         | sed 's|Best fit sample -log(Like) =||g' | awk '{print -$1 + 0.0}'`
 
 #dump in output file
-    collect="$modelname $nfreeparams $evidence $error $complexity $nunconsparams $bestfit"
+    if [ $whichD == 1 ]; then
+	collect="$modelname $nfreeparams $evidence $error $dimensionality $nunconsparams $bestfit"
+    else
+	collect="$modelname $nfreeparams $evidence $error $complexity $nunconsparams $bestfit"
+    fi
 
     echo $collect \
 	| awk '{ printf "%-12s %-12s %-12s %-12s %-12s %-12s %-12s \n",$1,$2,$3,$4,$5,$6,$7 }' \
-	>> $OUTFILE
+	      >> $OUTFILE
 }
 
 
@@ -199,9 +215,15 @@ namelist=`echo $statlist | sed 's|'$CHAINDIR/$PREFIX'||g' \
 | sed 's|'$SUFFIX'||g'`
 
 #add a header to the output file
-echo '#Name #Nparams #Evidence #Error #Complexity #Npars-Comp. #Best' \
-    | awk '{ printf "%-12s %-12s %-12s %-12s %-12s %-12s %-12s \n",$1,$2,$3,$4,$5,$6,$7 }' \
-	  > $OUTFILE
+if [ $whichD == 1 ]; then
+    echo '#Name #Nparams #Evidence #Error #Dimension  #Npars-Ndim  #Best' \
+	| awk '{ printf "%-12s %-12s %-12s %-12s %-12s %-12s %-12s \n",$1,$2,$3,$4,$5,$6,$7 }' \
+	      > $OUTFILE
+else
+    echo '#Name #Nparams #Evidence #Error #Complexity  #Npars-Comp.  #Best' \
+	| awk '{ printf "%-12s %-12s %-12s %-12s %-12s %-12s %-12s \n",$1,$2,$3,$4,$5,$6,$7 }' \
+	      > $OUTFILE
+fi
 
 count=0
 for x in $namelist

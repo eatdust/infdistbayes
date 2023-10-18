@@ -116,6 +116,7 @@ print(likestats,file=open(likename, 'w'))
 deltamean = 2.0*(likestats.meanLogLike - likestats.logMeanLike)
 extraname = outstatdir+rootname+'_extrastats'
 print('complexity =',likestats.complexity,file=open(extraname,'w'))
+print('dimensionality =',likestats.dimensionality,file=open(extraname,'w'))
 print('deltamean =',deltamean,file=open(extraname,'a'))
 print('saved as: ',extraname)
 
