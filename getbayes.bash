@@ -40,11 +40,16 @@ export DATAPARAMLIST='lnRreh'
 #use Bayesian Model Complexity (0) or Bayesian Model Dimensionality (1)
 whichD=1
 
+#use Multinest evidences(0), INS evidences (1) or polychord evidences
+#(2) [(-1) for obsoleted multinest versions]
+whichZ=0
+
 export OUTDIR='./output'
 export OUTFILE='bayesdist.log'
 
+##########################################################################
 
-#how to get the evidence values in output stat files
+#how to grep the evidence values in output stat files
 
 #whichZ=-1
 export GRABOLDZ="Global Evidence"
@@ -57,10 +62,6 @@ export GRABINSZ='Nested Importance Sampling Global Log-Evidence'
 
 #whichZ=2
 export GRABCHORDZ='log(Z)      '
-
-#use Multinest evidences(0), INS evidences (1) or polychord evidences
-#(2) [(-1) for obsoleted multinest versions]
-whichZ=0
 
 
 #how to retrieve the stat files (polychord and multinest output
