@@ -37,7 +37,9 @@ export EXECDIR=$CURRENTDIR/'src/'
 #compute marginalized distribution for these parameters
 export DATAPARAMLIST='lnRreh'
 
-#use Bayesian Model Complexity (0) or Bayesian Model Dimensionality (1)
+#use Bayesian Model Complexity (0) or Bayesian Model Dimensionality (1).
+#The latter is computed using the anesthetic package and this also
+#trigger the computation of the global information gain
 whichD=1
 
 #use Multinest evidences(0), INS evidences (1) or polychord evidences
@@ -81,6 +83,9 @@ fi
 export BINDIST='python '$EXECDIR'infbayes.py'
 export OPTDIST=' --distfile '$DISTFILE' --chaindir '$CHAINDIR' --outplotdir '$PLOTDIR
 export OPTDIST=$OPTDIST' --outstatdir '$STATDIR' --datafor '$DATAPARAMLIST' --datadir '$DATADIR
+if [ $whichD == 1 ]; then
+    export OPTDIST=$OPTDIST' --bayestats '
+fi
 
 export EXECDIST=$BINDIST$OPTDIST
 

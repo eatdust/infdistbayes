@@ -36,6 +36,7 @@ parser.add_argument("--outstatdir", type=str, help="where to put the marge and l
 parser.add_argument("--plottype", type=str, help="image extension (eps, png, ...)")
 parser.add_argument("--datafor", type=str, nargs='+', help="output marginalized probality for the named parameters")
 parser.add_argument("--datadir", type=str, help="where to dump the marginalized probabilities")
+parser.add_argument("--bayestats", action="store_true", help="whether to compute the global information gain (anesthetic)")
 
 
 
@@ -74,6 +75,7 @@ if pargs.datadir is not None:
 else:
     datadir = "data/"
 
+bayestats = pargs.bayestats
     
 sampler = 'nested'
 #sampler = 'polychord'    
@@ -94,7 +96,8 @@ if mc.sampler == 'nested' or mc.sampler == 'polychord':
 
 #we get the Kullback-Leibler divergence from anesthetic (which
 #automagically detect the type of chains)
-an = an.read_chains(root=chaindirname+rootname)
+if bayestats:
+    an = an.read_chains(root=chaindirname+rootname)
 
 
 #### stats
@@ -117,11 +120,12 @@ likename = outstatdir+rootname+'_likestats'
 print('saved as: ',likename)
 print(likestats,file=open(likename, 'w'))
 
-print('Getting bayestats...')
-bayestats = an.stats()
-bayesname = outstatdir+rootname+'_bayestats'
-print('saved as: ',bayesname)
-print(bayestats,file=open(bayesname, 'w'))
+if bayestats:
+    print('Getting bayestats...')
+    bayestats = an.stats()
+    bayesname = outstatdir+rootname+'_bayestats'
+    print('saved as: ',bayesname)
+    print(bayestats,file=open(bayesname, 'w'))
 
 print('Getting extrastats...')
 
@@ -133,10 +137,13 @@ print('Getting extrastats...')
 deltamean = 2.0*(likestats.meanLogLike - likestats.logMeanLike)
 extraname = outstatdir+rootname+'_extrastats'
 print('complexity =',likestats.complexity,file=open(extraname,'w'))
-print('dimensionality =',2*likestats.varLogLike,file=open(extraname,'w'))
+print('dimensionality =',2*likestats.varLogLike,file=open(extraname,'a'))
 print('deltamean =',deltamean,file=open(extraname,'a'))
-print('D_KL (bits) = ',bayestats.D_KL/math.log(2),file=open(extraname,'a'))
-print('d_G = ',bayestats.d_G,file=open(extraname,'a'))
+
+if bayestats:
+    print('D_KL (bits) = ',bayestats.D_KL/math.log(2),file=open(extraname,'a'))
+    print('d_G = ',bayestats.d_G,file=open(extraname,'a'))
+
 print('saved as: ',extraname)
 
 
