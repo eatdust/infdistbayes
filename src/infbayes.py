@@ -141,8 +141,8 @@ print('dimensionality =',2*likestats.varLogLike,file=open(extraname,'a'))
 print('deltamean =',deltamean,file=open(extraname,'a'))
 
 if dobayestats:
-    print('D_KL (bits) = ',bayestats.D_KL()/math.log(2),file=open(extraname,'a'))
-    print('d_G = ',bayestats.d_G(),file=open(extraname,'a'))
+    print('D_KL (bits) = ',bayestats.D_KL/math.log(2),file=open(extraname,'a'))
+    print('d_G = ',bayestats.d_G,file=open(extraname,'a'))
 
 print('saved as: ',extraname)
 
