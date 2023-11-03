@@ -75,8 +75,8 @@ if pargs.datadir is not None:
 else:
     datadir = "data/"
 
-bayestats = pargs.bayestats
-    
+dobayestats = pargs.bayestats
+
 sampler = 'nested'
 #sampler = 'polychord'    
 
@@ -96,7 +96,7 @@ if mc.sampler == 'nested' or mc.sampler == 'polychord':
 
 #we get the Kullback-Leibler divergence from anesthetic (which
 #automagically detect the type of chains)
-if bayestats:
+if dobayestats:
     an = an.read_chains(root=chaindirname+rootname)
 
 
@@ -120,7 +120,7 @@ likename = outstatdir+rootname+'_likestats'
 print('saved as: ',likename)
 print(likestats,file=open(likename, 'w'))
 
-if bayestats:
+if dobayestats:
     print('Getting bayestats...')
     bayestats = an.stats()
     bayesname = outstatdir+rootname+'_bayestats'
@@ -140,9 +140,9 @@ print('complexity =',likestats.complexity,file=open(extraname,'w'))
 print('dimensionality =',2*likestats.varLogLike,file=open(extraname,'a'))
 print('deltamean =',deltamean,file=open(extraname,'a'))
 
-if bayestats:
-    print('D_KL (bits) = ',bayestats.D_KL/math.log(2),file=open(extraname,'a'))
-    print('d_G = ',bayestats.d_G,file=open(extraname,'a'))
+if dobayestats:
+    print('D_KL (bits) = ',bayestats.D_KL()/math.log(2),file=open(extraname,'a'))
+    print('d_G = ',bayestats.d_G(),file=open(extraname,'a'))
 
 print('saved as: ',extraname)
 
