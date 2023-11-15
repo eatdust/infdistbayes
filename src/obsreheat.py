@@ -240,7 +240,7 @@ kldimVar = kldimVar - kldimMean**2
 
 dimVar = dimVar - dimMean**2
 nfreeVar = nfreeVar - nfreeMean**2
-gainVar = gainVar = gainMean**2
+gainVar = gainVar - gainMean**2
 
 print()
 print('================================================================')
@@ -295,7 +295,7 @@ rfig.create_2d_figure(name=outname+'_Dkl',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=1
 
 
 ylabelname = r'Unconstrained parameters $n-d$'
-rfig.create_2d_figure(name=outname+'_nfree',lnxmin=-7.0,lnxmax=0.1,ymin=-5,ymax=0.5,
+rfig.create_2d_figure(name=outname+'_nfree',lnxmin=-7.0,lnxmax=0.1,ymin=-1.5,ymax=0.5,
                       cname=paramtexname,formatname=formatname,
                       lnxdata=bayesfactor,ydata=bayesfree,ydataMean=nfreeMean,ydataVar=nfreeVar,
                       cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
