@@ -83,7 +83,7 @@ def load_likestats(filename,**kwargs):
     if kwargs:
         likestats = np.loadtxt(filename,liketype,usecols=(0,1,2,3,4,5),**kwargs)
     else:
-        likestats = np.loadtxt(filename,liketype,usecols=(0,1,2,3,4,5),skiprows=6)              
+        likestats = np.loadtxt(filename,liketype,usecols=(0,1,2,3,4,5),skiprows=7)              
 
     return likestats
 
