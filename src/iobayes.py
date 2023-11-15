@@ -31,10 +31,10 @@ def load_bayesdist(filename,oldtype=False):
                      ('Nparams',np.dtype(int)),
                      ('Evidence',np.dtype(float)),
                      ('Error',np.dtype(float)),
-                     ('DKL',np.dtype(float)),
                      ('Dimension',np.dtype(float)),
                      ('NparamsMinusDim',np.dtype(float)),
-                     ('Best',np.dtype(float))])
+                     ('Best',np.dtype(float)),
+                     ('DKL',np.dtype(float))])
     
     
     if oldtype:

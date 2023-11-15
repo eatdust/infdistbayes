@@ -293,6 +293,12 @@ rfig.create_2d_figure(name=outname+'_Dkl',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=1
                       lnxdata=bayesfactor,ydata=bayesgain,ydataMean=gainMean,ydataVar=gainVar,
                       cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
 
+ylabelname = r'Bayesian dimensionality $d$'
+rfig.create_2d_figure(name=outname+'_d',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=4.,
+                      cname=paramtexname,formatname=formatname,
+                      lnxdata=bayesfactor,ydata=bayesdim,ydataMean=dimMean,ydataVar=dimVar,
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
+
 
 ylabelname = r'Unconstrained parameters $n-d$'
 rfig.create_2d_figure(name=outname+'_nfree',lnxmin=-7.0,lnxmax=0.1,ymin=-1.5,ymax=0.5,
