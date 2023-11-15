@@ -29,7 +29,7 @@ def set_figure_params(xlabsize,ylabsize,unit):
 
 def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
                      lnxdata,ydata,ydataMean,ydataVar,cdata,
-                     labelname=None):
+                     xlabelname=None,ylabelname=None,labelname=None):
 
     set_figure_params(12,12,'cm')
 
@@ -45,14 +45,14 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
 
     #ax0.set_title('Observing the inflationary reheating',fontsize=8)
 
-    ax0.set_xlabel(r'Bayes factor $\mathcal{B}/\mathcal{B}_{\mathrm{best}}$',fontsize=fslabel)
+    ax0.set_xlabel(xlabelname,fontsize=fslabel)
     ax0.set_xscale('log')
     ax0.set_xlim(xmin, xmax)
-    ax0.set_ylabel(r'Information gain $D_\mathrm{KL}$ (in bits)',fontsize=fslabel)
+    ax0.set_ylabel(ylabelname,fontsize=fslabel)
     ax0.set_ylim(ymin, ymax)
 
     #color scale
-    c = plt.scatter(np.exp(lnxdata),ydata,c=cdata,s=100,
+    c = plt.scatter(np.exp(lnxdata),ydata,s=100,c=cdata,
                     linewidths=0.5,edgecolors='black',cmap='jet',zorder=10)
 
 
@@ -100,14 +100,14 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
     ax0.text(xstg,ytext, 'strongly disfavored', color='black',fontsize=fsjeffrey
              ,horizontalalignment='center',verticalalignment='center')
     
-
-    ymean = ydataMean
-    ystddev= np.sqrt(ydataVar)
-    yone = ymean - 0.5*ystddev
-    ytwo = ymean + 0.5*ystddev
-
-    ax0.fill_between(x=[xmin,xmax],y1=[yone,yone],y2=[ytwo,ytwo],facecolor='yellow', alpha=0.8)
-
+    if ydataMean is not None:
+        ymean = ydataMean
+        ystddev= np.sqrt(ydataVar)
+        yone = ymean - 0.5*ystddev
+        ytwo = ymean + 0.5*ystddev
+        ax0.fill_between(x=[xmin,xmax],y1=[yone,yone],y2=[ytwo,ytwo],facecolor='yellow', alpha=0.8)
+        
+        
     if name == 'plc_2':
       ymeanplc1 = 0.556088498289
       ystddevplc1 = 0.286561281445 
@@ -137,3 +137,5 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
                , horizontalalignment='right',verticalalignment='center',zorder=11,fontsize=fslabel)
 
     plt.savefig(name + '.' +formatname, format=formatname, dpi=150, bbox_inches='tight')
+
+

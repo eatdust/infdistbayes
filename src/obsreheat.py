@@ -111,6 +111,9 @@ n = 0
 kldiv = []
 kldim = []
 bayesfactor = []
+bayesdim = []
+bayesfree = []
+bayesgain = []
 proba = []
 norm = 0.0
 best = []
@@ -166,7 +169,7 @@ for i in range(bayesdist.shape[0]):
   xmin = max(min(xprior),min(xpost))
   xmax = min(max(xprior),max(xpost))
 
-  print('xmin= xmax= ',xmin,xmax)
+#  print('xmin= xmax= ',xmin,xmax)
 
   Imean = kl.kullback_leibler(p,q,(xmin,xmax))
   I2mean = kl.kullback_leibler_second_moment(p,q,(xmin,xmax))
@@ -176,16 +179,25 @@ for i in range(bayesdist.shape[0]):
   Bfactor = bayesdist['Evidence'][i]-bayesmax
   expBfactor = np.exp(Bfactor)
 
+  
   bayesfactor.append(Bfactor)
+  bayesdim.append(bayesdist['Dimension'][i])
+  bayesfree.append(bayesdist['NparamsMinusDim'][i])
+  bayesgain.append(bayesdist['DKL'][i])
   proba.append(expBfactor)
   norm += expBfactor
 
-  print('KL=  ',kldiv[n])
-  print('d=   ',kldim[n])
-  print('lnB= ',bayesfactor[n])
-  print('Param is: ',param)
+  print('---------------------------------')
+  print('For param:  ',param)
+  print('KL=       ',kldiv[n])
+  print('d=        ',kldim[n])
+  print('+++++++++++++++++++++++++++++++++')
+  print('lnB=        ',bayesfactor[n])
+  print('KL=         ',bayesgain[n])
+  print('d=          ',bayesdim[n])
+  print('n-d=        ',bayesfree[n])
   print('Best= Mean= ',best[n],mean[n])
-       
+  print('---------------------------------')
   n += 1
 
 
@@ -193,11 +205,18 @@ for i in range(bayesdist.shape[0]):
 nmodel = n
 proba = proba/norm
 
+cumul  = 0.0
 kldivMean = 0.0
 kldivVar = 0.0
 kldimMean = 0.0
 kldimVar = 0.0
-cumul  = 0.0
+
+dimMean = 0.0
+dimVar = 0.0
+nfreeMean = 0.0
+nfreeVar = 0.0
+gainMean = 0.0
+gainVar = 0.0
 
 for n in range(nmodel):
   cumul +=proba[n]
@@ -206,24 +225,77 @@ for n in range(nmodel):
   kldimMean = kldimMean + proba[n]*kldim[n]
   kldimVar = kldimVar + proba[n]*kldim[n]*kldim[n]
 
+  dimMean = dimMean + proba[n]*bayesdim[n]
+  dimVar = dimVar + proba[n]*bayesdim[n]*bayesdim[n]
+  
+  nfreeMean = nfreeMean + proba[n]*bayesfree[n]
+  nfreeVar = nfreeVar + proba[n]*bayesfree[n]*bayesfree[n]
+  
+  gainMean = gainMean + proba[n]*bayesgain[n]
+  gainVar = gainVar +  proba[n]*bayesgain[n]*bayesgain[n]
+  
+
 kldivVar = kldivVar - kldivMean**2
 kldimVar = kldimVar - kldimMean**2
 
+dimVar = dimVar - dimMean**2
+nfreeVar = nfreeVar - nfreeMean**2
+gainVar = gainVar = gainMean**2
+
 print()
 print('================================================================')
-print('<Dkl>= ',kldivMean)
-print('sqrt[<Dkl^2> - <Dkl>^2]= ',np.sqrt(kldivVar))
-print('min(Dkl)= max(Dkl)= ',min(kldiv),max(kldiv))
-print('<d>= ',kldimMean)
-print('sqrt[<d^2> - <d>^2]= ',np.sqrt(kldimVar))
-print('min(d)= max(d)= ',min(kldim),max(kldim))
+print('For the selected parameter: ',param)
+print('<Dkl>=                      ',kldivMean)
+print('sqrt[<Dkl^2> - <Dkl>^2]=    ',np.sqrt(kldivVar))
+print('min(Dkl)= max(Dkl)=         ',min(kldiv),max(kldiv))
+print('<d>=                        ',kldimMean)
+print('sqrt[<d^2> - <d>^2]=        ',np.sqrt(kldimVar))
+print('min(d)= max(d)=             ',min(kldim),max(kldim))
 print('================================================================')
+
+print()
+print('================================================================')
+print('Overall statistics')
+print('<Dkl>=                      ',gainMean)
+print('sqrt[<Dkl^2> - <Dkl>^2]=    ',np.sqrt(gainVar))
+print('min(Dkl)= max(Dkl)=         ',min(bayesgain),max(bayesgain))
+print('<d>=                        ',dimMean)
+print('sqrt[<d^2> - <d>^2]=        ',np.sqrt(dimVar))
+print('min(d)= max(d)=             ',min(bayesdim),max(bayesdim))
+print('<n-d>=                      ',nfreeMean)
+print('sqrt[<(n-d)^2> - <n-d>^2]=  ',np.sqrt(nfreeVar))
+print('min(n-d)= max(n-d)=         ',min(bayesfree),max(bayesfree))
+print('================================================================')
+
 
 ############################################################################
 #output figures
 ############################################################################
 
-rfig.create_2d_figure(name=outname,lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=2.8,
+xlabelname = r'Bayes factor $\mathcal{B}/\mathcal{B}_{\mathrm{best}}$'
+ylabelname = r'Information gain $D_\mathrm{KL}^{\mathrm{reh}}$ (in bits)'
+
+rfig.create_2d_figure(name=outname+'_Dklreh',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=2.8,
                       cname=paramtexname,formatname=formatname,
                       lnxdata=bayesfactor,ydata=kldiv,ydataMean=kldivMean,ydataVar=kldivVar,
-                      cdata=mean,labelname=labelname)
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
+
+ylabelname = r'Dimensionality $d_{\mathrm{reh}}$'
+rfig.create_2d_figure(name=outname+'_dreh',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=4.0,
+                      cname=paramtexname,formatname=formatname,
+                      lnxdata=bayesfactor,ydata=kldim,ydataMean=kldimMean,ydataVar=kldimVar,
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
+
+
+ylabelname = r'Overall information gain $D_\mathrm{KL}$ (in bits)'
+rfig.create_2d_figure(name=outname+'_Dkl',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=10.0,
+                      cname=paramtexname,formatname=formatname,
+                      lnxdata=bayesfactor,ydata=bayesgain,ydataMean=gainMean,ydataVar=gainVar,
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
+
+
+ylabelname = r'Unconstrained parameters $n-d$'
+rfig.create_2d_figure(name=outname+'_nfree',lnxmin=-7.0,lnxmax=0.1,ymin=-5,ymax=0.5,
+                      cname=paramtexname,formatname=formatname,
+                      lnxdata=bayesfactor,ydata=bayesfree,ydataMean=nfreeMean,ydataVar=nfreeVar,
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)

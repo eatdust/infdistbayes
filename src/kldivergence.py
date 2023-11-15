@@ -26,10 +26,11 @@ def interp_probability_density(x,y):
 
 
 def kullback_leibler(p,q,bounds,inbit=True):
-    tol = 1e-3
+    tol = 1e-4
+    errmax = 0.01
     args=(p,q,inbit)
     KL,err = integrate.quad(kl_integrand,bounds[0],bounds[1],args,limit=1000,epsabs=tol,epsrel=tol)
-    if (err > tol):
+    if (err > errmax):
         print('kullback_leibler KL= error=: ',KL,err)
     return KL        
 
@@ -46,10 +47,11 @@ def kl_integrand(x,p,q,inbit):
 
 
 def kullback_leibler_second_moment(p,q,bounds,inbit=True):
-    tol = 1e-3
+    tol = 1e-4
+    errmax = 0.01
     args=(p,q,inbit)
     KL2,err = integrate.quad(kl_second_moment_integrand,bounds[0],bounds[1],args,limit=1000,epsabs=tol,epsrel=tol)
-    if (err > tol):
+    if (err > errmax):
         print('kullback_leibler_second_moment KL^2= error=: ',KL2,err)
     return KL2
 
