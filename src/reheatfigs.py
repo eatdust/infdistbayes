@@ -29,7 +29,7 @@ def set_figure_params(xlabsize,ylabsize,unit):
 
 def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
                      lnxdata,ydata,ydataMean,ydataVar,cdata,
-                     xlabelname=None,ylabelname=None,labelname=None):
+                     xlabelname=None,ylabelname=None,labelname=None,modelname=None):
 
     set_figure_params(12,12,'cm')
 
@@ -38,7 +38,8 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
 
     xmin = np.exp(lnxmin)
     xmax = np.exp(lnxmax)
-
+    xdata = np.exp(lnxdata)
+    
     fsjeffrey = 8
     fslabel = 12
     fscblabel=14
@@ -52,9 +53,14 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
     ax0.set_ylim(ymin, ymax)
 
     #color scale
-    c = plt.scatter(np.exp(lnxdata),ydata,s=100,c=cdata,
+    c = plt.scatter(xdata,ydata,s=100,c=cdata,
                     linewidths=0.5,edgecolors='black',cmap='jet',zorder=10)
 
+    if modelname is not None:
+        for i,aname in enumerate(modelname):
+            ax0.annotate(modelname[i][:4], (xdata[i], ydata[i]), xytext=(0,0),
+                         va="center", ha="center",fontsize=4,zorder=10,textcoords='offset points')
+            
 
     #legends and labels
     totor=(1,0.705,0)

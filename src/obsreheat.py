@@ -110,6 +110,7 @@ else:
 n = 0
 kldiv = []
 kldim = []
+modelname = []
 bayesfactor = []
 bayesdim = []
 bayesfree = []
@@ -179,7 +180,7 @@ for i in range(bayesdist.shape[0]):
   Bfactor = bayesdist['Evidence'][i]-bayesmax
   expBfactor = np.exp(Bfactor)
 
-  
+  modelname.append(bayesdist['Name'][i])
   bayesfactor.append(Bfactor)
   bayesdim.append(bayesdist['Dimension'][i])
   bayesfree.append(bayesdist['NparamsMinusDim'][i])
@@ -278,30 +279,35 @@ ylabelname = r'Information gain $D_\mathrm{KL}^{\mathrm{reh}}$ (in bits)'
 rfig.create_2d_figure(name=outname+'_Dklreh',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=2.8,
                       cname=paramtexname,formatname=formatname,
                       lnxdata=bayesfactor,ydata=kldiv,ydataMean=kldivMean,ydataVar=kldivVar,
-                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                      modelname=modelname)
 
 ylabelname = r'Dimensionality $d_{\mathrm{reh}}$'
-rfig.create_2d_figure(name=outname+'_dreh',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=4.0,
+rfig.create_2d_figure(name=outname+'_dreh',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=5.0,
                       cname=paramtexname,formatname=formatname,
                       lnxdata=bayesfactor,ydata=kldim,ydataMean=kldimMean,ydataVar=kldimVar,
-                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                      modelname=modelname)
 
 
 ylabelname = r'Overall information gain $D_\mathrm{KL}$ (in bits)'
 rfig.create_2d_figure(name=outname+'_Dkl',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=10.0,
                       cname=paramtexname,formatname=formatname,
                       lnxdata=bayesfactor,ydata=bayesgain,ydataMean=gainMean,ydataVar=gainVar,
-                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                      modelname=modelname)
 
 ylabelname = r'Bayesian dimensionality $d$'
-rfig.create_2d_figure(name=outname+'_d',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=4.,
+rfig.create_2d_figure(name=outname+'_d',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=5.0,
                       cname=paramtexname,formatname=formatname,
                       lnxdata=bayesfactor,ydata=bayesdim,ydataMean=dimMean,ydataVar=dimVar,
-                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                      modelname=modelname)
 
 
 ylabelname = r'Unconstrained parameters $n-d$'
-rfig.create_2d_figure(name=outname+'_nfree',lnxmin=-7.0,lnxmax=0.1,ymin=-1.5,ymax=0.5,
+rfig.create_2d_figure(name=outname+'_nfree',lnxmin=-7.0,lnxmax=0.1,ymin=-1,ymax=3,
                       cname=paramtexname,formatname=formatname,
                       lnxdata=bayesfactor,ydata=bayesfree,ydataMean=nfreeMean,ydataVar=nfreeVar,
-                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname)
+                      cdata=mean,xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                      modelname=modelname)
