@@ -54,15 +54,26 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
     ax0.set_ylabel(ylabelname,fontsize=fslabel)
     ax0.set_ylim(ymin, ymax)
 
-    #color scale
-    c = plt.scatter(xdata,ydata,s=100,c=cdata,
-                    linewidths=0.5,edgecolors='black',cmap='jet',zorder=10)
 
     if modelname is not None:
+
+        c = plt.scatter(xdata,ydata,s=0,c=cdata,
+                    linewidths=0.5,edgecolors='black',cmap='jet',zorder=10)
+        
         for i,aname in enumerate(modelname):
-            ax0.annotate(modelname[i][:truncmodel], (xdata[i], ydata[i]), xytext=(0,0),
-                         va="center", ha="center",fontsize=fsmodel,zorder=10,
-                         textcoords='offset points')
+            xlab = xdata[i]
+            ylab = ydata[i]
+            lab = "{:^4}".format(aname[:4])
+            col = c.to_rgba(cdata[i])
+            textcol = (1-col[0],1-col[1],1-col[2],col[3])
+            ax0.annotate(lab, xy=(xlab, ylab), xytext=(0,0),textcoords='offset points',
+                         va="center", ha="center",fontsize=fsmodel,color=textcol,zorder=10,
+                         bbox=dict(boxstyle='circle,pad=0.5',linewidth=0.5,facecolor=col,alpha=1.0))
+
+    else:
+
+        c = plt.scatter(xdata,ydata,s=100,c=cdata,
+                    linewidths=0.5,edgecolors='black',cmap='jet',zorder=10)
             
 
     #legends and labels
