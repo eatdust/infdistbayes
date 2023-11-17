@@ -39,7 +39,9 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
     xmin = np.exp(lnxmin)
     xmax = np.exp(lnxmax)
     xdata = np.exp(lnxdata)
-    
+
+    fsmodel = 4
+    truncmodel = 4
     fsjeffrey = 8
     fslabel = 12
     fscblabel=14
@@ -58,8 +60,9 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
 
     if modelname is not None:
         for i,aname in enumerate(modelname):
-            ax0.annotate(modelname[i][:4], (xdata[i], ydata[i]), xytext=(0,0),
-                         va="center", ha="center",fontsize=4,zorder=10,textcoords='offset points')
+            ax0.annotate(modelname[i][:truncmodel], (xdata[i], ydata[i]), xytext=(0,0),
+                         va="center", ha="center",fontsize=fsmodel,zorder=10,
+                         textcoords='offset points')
             
 
     #legends and labels
