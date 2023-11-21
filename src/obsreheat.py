@@ -192,12 +192,12 @@ for i in range(bayesdist.shape[0]):
   print('For param:  ',param)
   print('KL=       ',kldiv[n])
   print('d=        ',kldim[n])
+  print('Best= Mean= ',best[n],mean[n])
   print('+++++++++++++++++++++++++++++++++')
   print('lnB=        ',bayesfactor[n])
   print('KL=         ',bayesgain[n])
   print('d=          ',bayesdim[n])
   print('n-d=        ',bayesfree[n])
-  print('Best= Mean= ',best[n],mean[n])
   print('---------------------------------')
   n += 1
 
