@@ -34,13 +34,11 @@ class ModelBoxStyle:
 
     def __call__(self, x0, y0, width, height, mutation_size):
 
-        defpad = self.pad
-        defradius = self.radius
-        pad = mutation_size * defpad
+        pad = mutation_size * self.pad
         width, height = width + 2 * pad, height + 2 * pad
         x0, y0 = x0 - pad, y0 - pad
 
-        return mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=defradius)
+        return mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=self.radius)
             
 
 
@@ -50,9 +48,12 @@ def set_figure_params(xlabsize,ylabsize,unit):
     mpl.rcParams['ytick.labelsize'] = ylabsize
     mpl.rcParams['mathtext.fontset'] = unit
 
+    #register our new boxtyle
     mpl.patches.BoxStyle._style_list["aspicmodel"] = ModelBoxStyle
 
+    
 
+#unused but more robust thant ModelBoxStyle to future python API changes    
 def model_box(x0, y0, width, height, mutation_size):
 
     defpad = 0.3
@@ -65,8 +66,9 @@ def model_box(x0, y0, width, height, mutation_size):
     return mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=defradius)
 
 
+
 def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
-                     lnxdata,ydata,ydataMean,ydataVar,cdata,
+                     lnxdata,ydata,ydataMean,ydataVar,cdata,sdata=None,
                      xlabelname=None,ylabelname=None,labelname=None,modelname=None):
 
     set_figure_params(12,12,'cm')
@@ -91,13 +93,13 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
     ax0.set_xlim(xmin, xmax)
     ax0.set_ylabel(ylabelname,fontsize=fslabel)
     ax0.set_ylim(ymin, ymax)
-
+    
 
     if modelname is not None:
         
         norm = mpl.colors.Normalize(vmin=min(cdata),vmax=max(cdata))
         cmap = mpl.cm.jet
-        c = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
+        c = mpl.cm.ScalarMappable(norm=norm,cmap=cmap)
         
         for i,aname in enumerate(modelname):
             xlab = xdata[i]
@@ -112,8 +114,8 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
 
             
     else:
-
-        c = plt.scatter(xdata,ydata,s=100,c=cdata,
+        
+        c = plt.scatter(xdata,ydata,s=100*sdata,c=cdata,
                     linewidths=0.5,edgecolors='black',cmap='jet',zorder=10)
             
 
