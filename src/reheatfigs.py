@@ -19,12 +19,50 @@
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import matplotlib.path as mpp
+
+
+class ModelBoxStyle:
+    """A model box."""
+
+    def __init__(self, pad=0.3, radius=10):
+
+        self.pad = pad
+        self.radius = radius
+
+        super().__init__()
+
+    def __call__(self, x0, y0, width, height, mutation_size):
+
+        defpad = self.pad
+        defradius = self.radius
+        pad = mutation_size * defpad
+        width, height = width + 2 * pad, height + 2 * pad
+        x0, y0 = x0 - pad, y0 - pad
+
+        return mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=defradius)
+            
 
 
 def set_figure_params(xlabsize,ylabsize,unit):
+    
     mpl.rcParams['xtick.labelsize'] = xlabsize
     mpl.rcParams['ytick.labelsize'] = ylabsize
     mpl.rcParams['mathtext.fontset'] = unit
+
+    mpl.patches.BoxStyle._style_list["aspicmodel"] = ModelBoxStyle
+
+
+def model_box(x0, y0, width, height, mutation_size):
+
+    defpad = 0.3
+    defradius = 15
+    pad = mutation_size * defpad
+    width, height = width + 2 * pad, height + 2 * pad
+
+    x0, y0 = x0 - pad, y0 - pad
+
+    return mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=defradius)
 
 
 def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
@@ -56,20 +94,23 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
 
 
     if modelname is not None:
-
-        c = plt.scatter(xdata,ydata,s=0,c=cdata,
-                    linewidths=0.5,edgecolors='black',cmap='jet',zorder=10)
+        
+        norm = mpl.colors.Normalize(vmin=min(cdata),vmax=max(cdata))
+        cmap = mpl.cm.jet
+        c = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
         
         for i,aname in enumerate(modelname):
             xlab = xdata[i]
             ylab = ydata[i]
             lab = "{:^4}".format(aname[:4])
-            col = c.to_rgba(cdata[i])
+            col = cmap(norm(cdata[i]))
             textcol = (1-col[0],1-col[1],1-col[2],col[3])
+            
             ax0.annotate(lab, xy=(xlab, ylab), xytext=(0,0),textcoords='offset points',
                          va="center", ha="center",fontsize=fsmodel,color=textcol,zorder=10,
-                         bbox=dict(boxstyle='circle,pad=0.5',linewidth=0.5,facecolor=col,alpha=1.0))
+                         bbox=dict(boxstyle="aspicmodel,pad=0.0,radius=12",linewidth=0.5,facecolor=col,alpha=1.0))
 
+            
     else:
 
         c = plt.scatter(xdata,ydata,s=100,c=cdata,
@@ -105,7 +146,7 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
       ax0.fill_between(x=[xmin,Bmod],y1=[ymax,ymax],y2=ymin,facecolor='grey', alpha=0.4)
 
   
-    ytext=ymax + 0.1
+    ytext=ymax + 0.05*(ymax-ymin)
     xinc = np.exp(Einc+0.5*(lnxmax-Einc))
     xweak = np.exp(Eweak+0.5*(Einc-Eweak))
     xmod = np.exp(Emod + 0.5*(Eweak-Emod))
@@ -141,7 +182,7 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
                           ,ticks=[-10,-20,-30,-40,0,+10])
     #cb.set_label('best reheating scenario')
     #cb.set_label(r'$\left.\ln(R_{\mathrm{reh}})\right|_{\mathrm{best}}$')
-    plt.clim(-45,11)
+    c.set_clim(-45,11)
     cb.set_label(cname,fontsize=fscblabel)
 
     for t in cb.ax.get_yticklabels():
