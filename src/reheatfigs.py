@@ -20,15 +20,18 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.path as mpp
+import matplotlib.patches as mpt
+import matplotlib.transforms as mtr
 
 
 class ModelBoxStyle:
     """A model box."""
 
-    def __init__(self, pad=0.3, radius=10):
+    def __init__(self, pad=0.3, radius=10, angle=None):
 
         self.pad = pad
         self.radius = radius
+        self.angle = angle
 
         super().__init__()
 
@@ -38,7 +41,23 @@ class ModelBoxStyle:
         width, height = width + 2 * pad, height + 2 * pad
         x0, y0 = x0 - pad, y0 - pad
 
-        return mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=self.radius)
+        modelbox = mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=self.radius)
+
+
+        if self.angle is not None:
+            ww = 0.3*self.radius
+            rw = self.radius + ww
+            origin = 90.0 
+            angle = 90.0 + self.angle
+
+            wedge = mpt.Wedge(center=(x0 + width / 2, y0 + height / 2), r=rw,
+                              theta1=origin, theta2=angle, width=ww).get_path()
+
+                
+            modelbox = mpp.Path.make_compound_path(modelbox,wedge)
+        
+
+        return modelbox
             
 
 
@@ -53,7 +72,7 @@ def set_figure_params(xlabsize,ylabsize,unit):
 
     
 
-#unused but more robust thant ModelBoxStyle to future python API changes    
+#unused but more robust than ModelBoxStyle to future python API changes    
 def model_box(x0, y0, width, height, mutation_size):
 
     defpad = 0.3
@@ -81,10 +100,9 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
     xdata = np.exp(lnxdata)
 
     fsmodel = 4
-    truncmodel = 4
     fsjeffrey = 8
     fslabel = 12
-    fscblabel=14
+    fscblabel = 14
 
     #ax0.set_title('Observing the inflationary reheating',fontsize=8)
 
@@ -100,6 +118,8 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
         norm = mpl.colors.Normalize(vmin=min(cdata),vmax=max(cdata))
         cmap = mpl.cm.jet
         c = mpl.cm.ScalarMappable(norm=norm,cmap=cmap)
+
+        boxstyle = "aspicmodel,radius=14"
         
         for i,aname in enumerate(modelname):
             xlab = xdata[i]
@@ -107,10 +127,17 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
             lab = "{:^4}".format(aname[:4])
             col = cmap(norm(cdata[i]))
             textcol = (1-col[0],1-col[1],1-col[2],col[3])
+
+            if sdata is not None:
+                strvalue = "{:^2}".format(max(0.0,360.0*sdata[i]))
+                aboxstyle = boxstyle + ",angle=" + strvalue
+            else:
+                aboxstyle = boxstyle
             
             ax0.annotate(lab, xy=(xlab, ylab), xytext=(0,0),textcoords='offset points',
                          va="center", ha="center",fontsize=fsmodel,color=textcol,zorder=10,
-                         bbox=dict(boxstyle="aspicmodel,pad=0.0,radius=12",linewidth=0.5,facecolor=col,alpha=1.0))
+                         bbox=dict(boxstyle=aboxstyle,linewidth=0.2,
+                                   edgecolor='black',facecolor=col,alpha=1.0))
 
             
     else:
@@ -119,7 +146,7 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
                     linewidths=0.5,edgecolors='black',cmap='jet',zorder=10)
             
 
-    #legends and labels
+    #legends and labels (from Totor's colormap)
     totor=(1,0.705,0)
     totob=(0,0.866,1)
 
@@ -147,21 +174,29 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
       ax0.fill_between(x=[Bmod,Bweak],y1=[ymax,ymax],y2=ymin,facecolor='red', alpha=0.2)
       ax0.fill_between(x=[xmin,Bmod],y1=[ymax,ymax],y2=ymin,facecolor='grey', alpha=0.4)
 
-  
-    ytext=ymax + 0.05*(ymax-ymin)
+
+    extrafrac = 0.05
+    ytext=ymax + extrafrac*(ymax-ymin)
     xinc = np.exp(Einc+0.5*(lnxmax-Einc))
     xweak = np.exp(Eweak+0.5*(Einc-Eweak))
     xmod = np.exp(Emod + 0.5*(Eweak-Emod))
     xstg = np.exp(lnxmin + 0.5*(Emod-lnxmin))
 
-    ax0.text(xinc,ytext, 'favored', color='black',fontsize=fsjeffrey
-             ,horizontalalignment='center',verticalalignment='center')
-    ax0.text(xweak,ytext, 'weakly disfavored', color='black',fontsize=fsjeffrey
-             ,horizontalalignment='center',verticalalignment='center')
-    ax0.text(xmod,ytext, 'moderately disfavored', color='black',fontsize=fsjeffrey
-             ,horizontalalignment='center',verticalalignment='center')
-    ax0.text(xstg,ytext, 'strongly disfavored', color='black',fontsize=fsjeffrey
-             ,horizontalalignment='center',verticalalignment='center')
+    if (xmin < xinc < xmax):
+        ax0.text(xinc,ytext, 'favored', color='black',fontsize=fsjeffrey
+                 ,horizontalalignment='center',verticalalignment='center')
+
+    if (xmin < xweak < xmax):
+        ax0.text(xweak,ytext, 'weakly disfavored', color='black',fontsize=fsjeffrey
+                 ,horizontalalignment='center',verticalalignment='center')
+
+    if (xmin < xmod < xmax):
+        ax0.text(xmod,ytext, 'moderately disfavored', color='black',fontsize=fsjeffrey
+                 ,horizontalalignment='center',verticalalignment='center')
+
+    if (xmin < xstg < xmax):
+        ax0.text(xstg,ytext, 'strongly disfavored', color='black',fontsize=fsjeffrey
+                 ,horizontalalignment='center',verticalalignment='center')
     
     if ydataMean is not None:
         ymean = ydataMean
@@ -199,6 +234,6 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
       ax0.text(1.0,0.5,labelname, bbox=dict(facecolor='white', alpha=0.8)
                , horizontalalignment='right',verticalalignment='center',zorder=11,fontsize=fslabel)
 
-    plt.savefig(name + '.' +formatname, format=formatname, dpi=150, bbox_inches='tight')
+    plt.savefig(name + '.' +formatname, format=formatname, dpi=200, bbox_inches='tight')
 
 
