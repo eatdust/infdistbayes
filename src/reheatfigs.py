@@ -27,12 +27,12 @@ import matplotlib.transforms as mtr
 class ModelBoxStyle:
     """A model box."""
 
-    def __init__(self, pad=0.3, radius=10, angle=None):
+    def __init__(self, pad=0.3, radius=6, angle=None):
 
         self.pad = pad
-        self.radius = radius
         self.angle = angle
-
+        self.radius = radius
+        
         super().__init__()
 
     def __call__(self, x0, y0, width, height, mutation_size):
@@ -41,12 +41,14 @@ class ModelBoxStyle:
         width, height = width + 2 * pad, height + 2 * pad
         x0, y0 = x0 - pad, y0 - pad
 
-        modelbox = mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=self.radius)
+        radius = 0.25 * mutation_size * self.radius
+        
+        modelbox = mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=radius)
 
 
         if self.angle is not None:
-            ww = 0.3*self.radius
-            rw = self.radius + ww
+            ww = self.pad * radius
+            rw = radius + ww
             origin = 90.0 
             angle = 90.0 + self.angle
 
@@ -61,36 +63,20 @@ class ModelBoxStyle:
             
 
 
-def set_figure_params(xlabsize,ylabsize,unit):
-    
-    mpl.rcParams['xtick.labelsize'] = xlabsize
-    mpl.rcParams['ytick.labelsize'] = ylabsize
-    mpl.rcParams['mathtext.fontset'] = unit
+def set_figure_params(dpi=None):
 
+    if dpi is not None:
+        mpl.rcParams['figure.dpi'] = dpi
+        
     #register our new boxtyle
     mpl.patches.BoxStyle._style_list["aspicmodel"] = ModelBoxStyle
-
     
-
-#unused but more robust than ModelBoxStyle to future python API changes    
-def model_box(x0, y0, width, height, mutation_size):
-
-    defpad = 0.3
-    defradius = 15
-    pad = mutation_size * defpad
-    width, height = width + 2 * pad, height + 2 * pad
-
-    x0, y0 = x0 - pad, y0 - pad
-
-    return mpp.Path.circle(center=(x0 + width / 2, y0 + height / 2),radius=defradius)
-
-
 
 def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
                      lnxdata,ydata,ydataMean,ydataVar,cdata,sdata=None,
                      xlabelname=None,ylabelname=None,labelname=None,modelname=None):
 
-    set_figure_params(12,12,'cm')
+    set_figure_params(dpi=200)
 
     fig, ax0 = plt.subplots()
     plt.axis([0,1,0,1])
@@ -103,23 +89,20 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
     fsjeffrey = 8
     fslabel = 12
     fscblabel = 14
-
-    #ax0.set_title('Observing the inflationary reheating',fontsize=8)
-
+    
     ax0.set_xlabel(xlabelname,fontsize=fslabel)
     ax0.set_xscale('log')
     ax0.set_xlim(xmin, xmax)
     ax0.set_ylabel(ylabelname,fontsize=fslabel)
     ax0.set_ylim(ymin, ymax)
     
-
     if modelname is not None:
         
         norm = mpl.colors.Normalize(vmin=min(cdata),vmax=max(cdata))
         cmap = mpl.cm.jet
         c = mpl.cm.ScalarMappable(norm=norm,cmap=cmap)
 
-        boxstyle = "aspicmodel,radius=14"
+        boxstyle = "aspicmodel,pad=0.3,radius=5.5"
         
         for i,aname in enumerate(modelname):
             xlab = xdata[i]
@@ -129,7 +112,7 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
             textcol = (1-col[0],1-col[1],1-col[2],col[3])
 
             if sdata is not None:
-                strvalue = "{:^2}".format(max(0.0,360.0*sdata[i]))
+                strvalue = "{:}".format(max(0.0,360.0*sdata[i]))
                 aboxstyle = boxstyle + ",angle=" + strvalue
             else:
                 aboxstyle = boxstyle
@@ -142,7 +125,7 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
             
     else:
         
-        c = plt.scatter(xdata,ydata,s=100*sdata,c=cdata,
+        c = plt.scatter(xdata,ydata,s=100,c=cdata,
                     linewidths=0.5,edgecolors='black',cmap='jet',zorder=10)
             
 
@@ -215,25 +198,21 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
 
 
     #reheating energy colorbar
-    cb = fig.colorbar(c,orientation='vertical',pad=0.01,aspect=30,fraction=0.05
-                          ,ticks=[-10,-20,-30,-40,0,+10])
-    #cb.set_label('best reheating scenario')
-    #cb.set_label(r'$\left.\ln(R_{\mathrm{reh}})\right|_{\mathrm{best}}$')
     c.set_clim(-45,11)
-    cb.set_label(cname,fontsize=fscblabel)
-
+    cb = fig.colorbar(c,orientation='vertical',pad=0.01,aspect=30,fraction=0.05
+                          ,ticks=[-10,-20,-30,-40,0,+10],ax=ax0)
+    cb.set_label(cname,fontsize=fscblabel)    
     for t in cb.ax.get_yticklabels():
-      t.set_fontsize(fslabel)
+        t.set_fontsize(fslabel)
 
-    #cb.ax.set_yticklabels(['radiation-like'],horizontalalignment='left',fontsize=8,rotation=90)
-
-
-    #some text: 1.0 0.5 right
-    #some text: 1e-3,4.0 left
     if labelname is not None:
-      ax0.text(1.0,0.5,labelname, bbox=dict(facecolor='white', alpha=0.8)
-               , horizontalalignment='right',verticalalignment='center',zorder=11,fontsize=fslabel)
+        ax0.text(1.0,0.5,labelname, bbox=dict(facecolor='white', alpha=0.8)
+                 , horizontalalignment='right',verticalalignment='center',zorder=11,fontsize=fslabel)
 
-    plt.savefig(name + '.' +formatname, format=formatname, dpi=200, bbox_inches='tight')
+#setting bbox for postscript messes the colorbar        
+    if (formatname == 'eps' or formatname == 'ps'):
+        plt.savefig(name + '.' +formatname, format=formatname)
+    else:
+        plt.savefig(name + '.' +formatname, format=formatname, bbox_inches='tight')
 
 
