@@ -73,7 +73,7 @@ def set_figure_params(dpi=None):
     
 
 def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
-                     lnxdata,ydata,ydataMean,ydataVar,cdata,sdata=None,
+                     lnxdata,ydata,ydataMean,ydataVar,cdata=None,sdata=None,
                      xlabelname=None,ylabelname=None,labelname=None,modelname=None):
 
     set_figure_params(dpi=200)
@@ -97,10 +97,11 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
     ax0.set_ylim(ymin, ymax)
     
     if modelname is not None:
-        
-        norm = mpl.colors.Normalize(vmin=min(cdata),vmax=max(cdata))
-        cmap = mpl.cm.jet
-        c = mpl.cm.ScalarMappable(norm=norm,cmap=cmap)
+
+        if cdata is not None:
+            norm = mpl.colors.Normalize(vmin=min(cdata),vmax=max(cdata))
+            cmap = mpl.cm.jet
+            c = mpl.cm.ScalarMappable(norm=norm,cmap=cmap)
 
         boxstyle = "aspicmodel,pad=0.3,radius=5.5"
         
@@ -108,9 +109,14 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
             xlab = xdata[i]
             ylab = ydata[i]
             lab = "{:^4}".format(aname[:4])
-            col = cmap(norm(cdata[i]))
-            textcol = (1-col[0],1-col[1],1-col[2],col[3])
 
+            if cdata is not None:
+                col = cmap(norm(cdata[i]))
+                textcol = (1-col[0],1-col[1],1-col[2],col[3])
+            else:
+                col = (1,1,1)
+                textcol = (0,0,0)
+                
             if sdata is not None:
                 strvalue = "{:}".format(max(0.0,360.0*sdata[i]))
                 aboxstyle = boxstyle + ",angle=" + strvalue
@@ -198,12 +204,13 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
 
 
     #reheating energy colorbar
-    c.set_clim(-45,11)
-    cb = fig.colorbar(c,orientation='vertical',pad=0.01,aspect=30,fraction=0.05
+    if cdata is not None:
+        c.set_clim(-45,11)
+        cb = fig.colorbar(c,orientation='vertical',pad=0.01,aspect=30,fraction=0.05
                           ,ticks=[-10,-20,-30,-40,0,+10],ax=ax0)
-    cb.set_label(cname,fontsize=fscblabel)    
-    for t in cb.ax.get_yticklabels():
-        t.set_fontsize(fslabel)
+        cb.set_label(cname,fontsize=fscblabel)    
+        for t in cb.ax.get_yticklabels():
+            t.set_fontsize(fslabel)
 
     if labelname is not None:
         ax0.text(1.0,0.5,labelname, bbox=dict(facecolor='white', alpha=0.8)
