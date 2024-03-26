@@ -153,14 +153,14 @@ for i in range(bayesdist.shape[0]):
   margestats = iob.load_margestats(margename)
   
   for j in range(margestats.shape[0]):
-    if margestats['parameter'][j] == param:
+    if (margestats['parameter'][j] == param) or (margestats['parameter'][j] == param+'*'):
       mean.append(margestats['mean'][j])
         
 
   likestats = iob.load_likestats(likename)
     
   for j in range(likestats.shape[0]):
-    if likestats['parameter'][j] == param:
+    if (likestats['parameter'][j] == param) or (likestats['parameter'][j] == param+'*'):
       best.append(likestats['bestfit'][j])
 
         
