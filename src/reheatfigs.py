@@ -74,7 +74,8 @@ def set_figure_params(dpi=None):
 
 def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
                      lnxdata,ydata,ydataMean,ydataVar,cdata=None,sdata=None,
-                     xlabelname=None,ylabelname=None,labelname=None,modelname=None):
+                     xlabelname=None,ylabelname=None,labelname=None,modelname=None,
+                     cminmax=None,cticks=None):
 
     set_figure_params(dpi=200)
 
@@ -203,11 +204,18 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
       #  plt.plot((xmin,xmax),(ymeanplc1-ystddevplc1/2,ymeanplc1-ystddevplc1/2),'k:')
 
 
-    #reheating energy colorbar
+    #(reheating energy) colorbar
     if cdata is not None:
-        c.set_clim(-45,11)
+        if cminmax is not None:
+            c.set_clim(cminmax[0],cminmax[1])
+        else:
+            c.set_clim(-45,11)
+
+        if cticks is None:
+            cticks = [-10,-20,-30,-40,0,+10]
+            
         cb = fig.colorbar(c,orientation='vertical',pad=0.01,aspect=30,fraction=0.05
-                          ,ticks=[-10,-20,-30,-40,0,+10],ax=ax0)
+                          ,ticks=cticks,ax=ax0)
         cb.set_label(cname,fontsize=fscblabel)    
         for t in cb.ax.get_yticklabels():
             t.set_fontsize(fslabel)

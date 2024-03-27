@@ -281,21 +281,22 @@ print('================================================================')
 xlabelname = r'Bayes factor $\mathcal{B}/\mathcal{B}_{\mathrm{best}}$'
 ylabelname = r'Information gain $D_\mathrm{KL}^{\mathrm{reh}}$ (in bits)'
 
-rfig.create_2d_figure(name=outname+'_Dklreh',lnxmin=-7,lnxmax=0.1,ymin=0.0,ymax=2.8,
-                      cname=paramtexname,formatname=formatname,
-                      lnxdata=bayesfactor,ydata=kldiv,ydataMean=kldivMean,ydataVar=kldivVar,
-                      cdata=mean,sdata=ffree,
-                      xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
-                      modelname=modelname)
+if (param == 'lnRreh'):
+  rfig.create_2d_figure(name=outname+'_Dklreh',lnxmin=-7,lnxmax=0.1,ymin=0.0,ymax=2.8,
+                        cname=paramtexname,formatname=formatname,
+                        lnxdata=bayesfactor,ydata=kldiv,ydataMean=kldivMean,ydataVar=kldivVar,
+                        cdata=mean,sdata=ffree,
+                        xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                        modelname=modelname)
 
-ylabelname = r'Dimensionality $d_{\mathrm{reh}}$'
-rfig.create_2d_figure(name=outname+'_dreh',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=5.0,
-                      cname=paramtexname,formatname=formatname,
-                      lnxdata=bayesfactor,ydata=kldim,ydataMean=kldimMean,ydataVar=kldimVar,
-                      cdata=mean,sdata=None,
-                      xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
-                      modelname=modelname)
-
+  ylabelname = r'Dimensionality $d_{\mathrm{reh}}$'
+  rfig.create_2d_figure(name=outname+'_dreh',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=5.0,
+                        cname=paramtexname,formatname=formatname,
+                        lnxdata=bayesfactor,ydata=kldim,ydataMean=kldimMean,ydataVar=kldimVar,
+                        cdata=mean,sdata=None,
+                        xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                        modelname=modelname)
+  
 
 ylabelname = r'Overall information gain $D_\mathrm{KL}$ (in bits)'
 rfig.create_2d_figure(name=outname+'_Dkl',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=10.0,
