@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 import iobayes as iob
 import kldivergence as kl
 import reheatfigs as rfig
+import postfigs as pfig
 import argparse
 import os
 
@@ -122,8 +123,11 @@ best = []
 mean = []
 ffree = []
 
+priors = []
+posteriors = []
+
 #read evidences
-bayesdist = iob.load_bayesdist( pargs.bayesdistname)
+bayesdist = iob.load_bayesdist(pargs.bayesdistname)
 
 bayesmax = np.amax(bayesdist['Evidence'])
 
@@ -164,14 +168,14 @@ for i in range(bayesdist.shape[0]):
       best.append(likestats['bestfit'][j])
 
         
-  xprior, prior = iob.load_and_normalize_probability(priorname)
-  xpost, post = iob.load_and_normalize_probability(postname)
+  xprior, prior, unprior = iob.load_and_normalize_probability(priorname)
+  xpost, post, unpost = iob.load_and_normalize_probability(postname)
 
   q = kl.interp_probability_density(xprior,prior)
   p = kl.interp_probability_density(xpost,post)
   xmin = max(min(xprior),min(xpost))
   xmax = min(max(xprior),max(xpost))
-
+  
 #  print('xmin= xmax= ',xmin,xmax)
 
   Imean = kl.kullback_leibler(p,q,(xmin,xmax))
@@ -192,6 +196,9 @@ for i in range(bayesdist.shape[0]):
   proba.append(expBfactor)
   norm += expBfactor
 
+  priors.append([xprior,prior])
+  posteriors.append([xpost,post])
+  
   print('---------------------------------')
   print('For param:  ',param)
   print('KL=       ',kldiv[n])
@@ -279,24 +286,6 @@ print('================================================================')
 ############################################################################
 
 xlabelname = r'Bayes factor $\mathcal{B}/\mathcal{B}_{\mathrm{best}}$'
-ylabelname = r'Information gain $D_\mathrm{KL}^{\mathrm{reh}}$ (in bits)'
-
-if (param == 'lnRreh'):
-  rfig.create_2d_figure(name=outname+'_Dklreh',lnxmin=-7,lnxmax=0.1,ymin=0.0,ymax=2.8,
-                        cname=paramtexname,formatname=formatname,
-                        lnxdata=bayesfactor,ydata=kldiv,ydataMean=kldivMean,ydataVar=kldivVar,
-                        cdata=mean,sdata=ffree,
-                        xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
-                        modelname=modelname)
-
-  ylabelname = r'Dimensionality $d_{\mathrm{reh}}$'
-  rfig.create_2d_figure(name=outname+'_dreh',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=5.0,
-                        cname=paramtexname,formatname=formatname,
-                        lnxdata=bayesfactor,ydata=kldim,ydataMean=kldimMean,ydataVar=kldimVar,
-                        cdata=mean,sdata=None,
-                        xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
-                        modelname=modelname)
-  
 
 ylabelname = r'Overall information gain $D_\mathrm{KL}$ (in bits)'
 rfig.create_2d_figure(name=outname+'_Dkl',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=10.0,
@@ -322,3 +311,45 @@ rfig.create_2d_figure(name=outname+'_nfree',lnxmin=-7,lnxmax=0.1,ymin=-1,ymax=3,
                       cdata=mean,sdata=None,
                       xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
                       modelname=modelname)
+
+
+if (param == 'lnRreh'):
+  ylabelname = r'Information gain $D_\mathrm{KL}^{\mathrm{reh}}$ (in bits)'
+  rfig.create_2d_figure(name=outname+'_Dklreh',lnxmin=-7,lnxmax=0.1,ymin=0.0,ymax=2.8,
+                        cname=paramtexname,formatname=formatname,
+                        lnxdata=bayesfactor,ydata=kldiv,ydataMean=kldivMean,ydataVar=kldivVar,
+                        cdata=mean,sdata=ffree,
+                        xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                        modelname=modelname,
+                        cminmax=[-45,11],cticks=[-10,-20,-30,-40,0,+10])
+
+  ylabelname = r'Dimensionality $d_{\mathrm{reh}}$'
+  rfig.create_2d_figure(name=outname+'_dreh',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=5.0,
+                        cname=paramtexname,formatname=formatname,
+                        lnxdata=bayesfactor,ydata=kldim,ydataMean=kldimMean,ydataVar=kldimVar,
+                        cdata=mean,sdata=None,
+                        xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                        modelname=modelname,
+                        cminmax=[-45,11],cticks=[-10,-20,-30,-40,0,+10])
+
+if (param == 'eps3'):
+  ylabelname = r'Information gain $D_\mathrm{KL}^{\epsilon_3}$ (in bits)'
+  rfig.create_2d_figure(name=outname+'_eps3',lnxmin=-7,lnxmax=0.1,ymin=0.0,ymax=2.8,
+                        cname=paramtexname,formatname=formatname,
+                        lnxdata=bayesfactor,ydata=kldiv,ydataMean=kldivMean,ydataVar=kldivVar,
+                        cdata=mean,sdata=ffree,
+                        xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                        modelname=modelname,cminmax=[-0.2,0.2])
+  
+
+
+units = np.ones(nmodel)/nmodel
+ylabelname = r'$P\left(\alpha_\mathrm{S}|\mathcal{D}\right)$'
+titlename = 'Normalized posterior distribution (model space)'
+pfig.create_1d_figure(name='posteriors',distrib=posteriors,weight=proba,xmin=-0.0025,xmax=0.0005,
+                      xlabelname=paramtexname,ylabelname=ylabelname,titlename=titlename,formatname=formatname,save=True)
+titlename = 'Normalized prior distribution (model space)'
+ylabelname = r'$\pi\left(\alpha_\mathrm{S}\right)$'
+pfig.create_1d_figure(name='priors',distrib=priors,weight=units,xmin=-0.01,xmax=0.003,ymax=800,
+                      xlabelname=paramtexname,ylabelname=ylabelname,titlename=titlename,formatname=formatname,save=True)
+  

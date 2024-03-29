@@ -91,7 +91,12 @@ def load_likestats(filename,**kwargs):
 def load_and_normalize_probability(filename):
     x,y = np.loadtxt(filename,unpack=True,usecols=[0,1])
     norm = integrate.simps(y,x)
-    return x,y/norm
+    return x,y/norm,y
+
+
+def load_xy(filename):
+    x,y = np.loadtxt(filename,unpack=True,usecols=[0,1])    
+    return x,y
 
 
 def save_probability_1d(filename,x,P):

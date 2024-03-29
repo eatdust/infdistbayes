@@ -208,14 +208,14 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
     if cdata is not None:
         if cminmax is not None:
             c.set_clim(cminmax[0],cminmax[1])
-        else:
-            c.set_clim(-45,11)
 
-        if cticks is None:
-            cticks = [-10,-20,-30,-40,0,+10]
+        if cticks is not None:
+            cb = fig.colorbar(c,orientation='vertical',pad=0.01,aspect=30,fraction=0.05
+                              ,ticks=cticks,ax=ax0)
+        else:
+            cb = fig.colorbar(c,orientation='vertical',pad=0.01,aspect=30,fraction=0.05
+                              ,ticks=cticks,ax=ax0)
             
-        cb = fig.colorbar(c,orientation='vertical',pad=0.01,aspect=30,fraction=0.05
-                          ,ticks=cticks,ax=ax0)
         cb.set_label(cname,fontsize=fscblabel)    
         for t in cb.ax.get_yticklabels():
             t.set_fontsize(fslabel)
@@ -229,5 +229,4 @@ def create_2d_figure(name,lnxmin,lnxmax,ymin,ymax,cname,formatname,
         plt.savefig(name + '.' +formatname, format=formatname)
     else:
         plt.savefig(name + '.' +formatname, format=formatname, bbox_inches='tight')
-
 
