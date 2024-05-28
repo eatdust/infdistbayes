@@ -1,6 +1,6 @@
 #   This file is part of infdistbayes
 #
-#   Copyright (C) 2021-2023 C. Ringeval
+#   Copyright (C) 2021-2024 C. Ringeval
 #   
 #   infdistbayes is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -21,9 +21,6 @@ import numpy as np
 import scipy as sp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import matplotlib.path as mpp
-import matplotlib.patches as mpt
-import matplotlib.transforms as mtr
 
 
 def set_figure_params(dpi=None):
@@ -117,4 +114,9 @@ def create_1d_figure(name,distrib,weight,xmin=None,xmax=None,ymax=None,
 
 
     if save:
-        iob.save_probability_1d(name + '.dat',xgrid,ywgrid)
+        minf=-0.01
+        pinf = 0.01
+        nsave = 100000
+        xsave = np.linspace(max(minf,min(xpoints)),min(pinf,max(xpoints)),nsave)
+        ywsave = finterpsum(xsave,fys)
+        iob.save_probability_1d(name + '.dat',xsave,ywsave)

@@ -332,6 +332,27 @@ if (param == 'lnRreh'):
                         modelname=modelname,
                         cminmax=[-45,11],cticks=[-10,-20,-30,-40,0,+10])
 
+if (param == 'lnRrad'):
+  ylabelname = r'Information gain $D_\mathrm{KL}^{\mathrm{rad}}$ (in bits)'
+  paramtexname = r'$\left\langle \ln R_{\mathrm{rad}} \right\rangle$'
+  rfig.create_2d_figure(name=outname+'_Dklrad',lnxmin=-7,lnxmax=0.1,ymin=0.0,ymax=2.8,
+                        cname=paramtexname,formatname=formatname,
+                        lnxdata=bayesfactor,ydata=kldiv,ydataMean=kldivMean,ydataVar=kldivVar,
+                        cdata=mean,sdata=ffree,
+                        xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                        modelname=modelname,
+                        cminmax=[-45,11],cticks=[-10,-20,-30,-40,0,+10])
+
+  ylabelname = r'Dimensionality $d_{\mathrm{rad}}$'
+  rfig.create_2d_figure(name=outname+'_drad',lnxmin=-7.0,lnxmax=0.1,ymin=0.0,ymax=5.0,
+                        cname=paramtexname,formatname=formatname,
+                        lnxdata=bayesfactor,ydata=kldim,ydataMean=kldimMean,ydataVar=kldimVar,
+                        cdata=mean,sdata=None,
+                        xlabelname=xlabelname,ylabelname=ylabelname,labelname=labelname,
+                        modelname=modelname,
+                        cminmax=[-45,11],cticks=[-10,-20,-30,-40,0,+10])
+  
+
 if (param == 'eps3'):
   ylabelname = r'Information gain $D_\mathrm{KL}^{\epsilon_3}$ (in bits)'
   rfig.create_2d_figure(name=outname+'_eps3',lnxmin=-7,lnxmax=0.1,ymin=0.0,ymax=2.8,
@@ -342,14 +363,14 @@ if (param == 'eps3'):
                         modelname=modelname,cminmax=[-0.2,0.2])
   
 
-
-units = np.ones(nmodel)/nmodel
-ylabelname = r'$P\left(\alpha_\mathrm{S}|\mathcal{D}\right)$'
-titlename = 'Normalized posterior distribution (model space)'
-pfig.create_1d_figure(name='posteriors',distrib=posteriors,weight=proba,xmin=-0.0025,xmax=0.0005,
-                      xlabelname=paramtexname,ylabelname=ylabelname,titlename=titlename,formatname=formatname,save=True)
-titlename = 'Normalized prior distribution (model space)'
-ylabelname = r'$\pi\left(\alpha_\mathrm{S}\right)$'
-pfig.create_1d_figure(name='priors',distrib=priors,weight=units,xmin=-0.01,xmax=0.003,ymax=800,
-                      xlabelname=paramtexname,ylabelname=ylabelname,titlename=titlename,formatname=formatname,save=True)
+if (param == 'alpha'):
+  units = np.ones(nmodel)/nmodel
+  ylabelname = r'$P\left(\alpha_\mathrm{S}|\mathcal{D}\right)$'
+  titlename = 'Normalized posterior distribution (model space)'
+  pfig.create_1d_figure(name='posteriors',distrib=posteriors,weight=proba,xmin=-0.0025,xmax=0.0005,
+                        xlabelname=paramtexname,ylabelname=ylabelname,titlename=titlename,formatname=formatname,save=True)
+  titlename = 'Normalized prior distribution (model space)'
+  ylabelname = r'$\pi\left(\alpha_\mathrm{S}\right)$'
+  pfig.create_1d_figure(name='priors',distrib=priors,weight=units,xmin=-0.01,xmax=0.003,ymax=800,
+                        xlabelname=paramtexname,ylabelname=ylabelname,titlename=titlename,formatname=formatname,save=True)
   
