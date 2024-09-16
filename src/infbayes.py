@@ -34,7 +34,8 @@ parser.add_argument("--chaindir", type=str, help="path to the chains/ directory"
 parser.add_argument("--outplotdir", type=str, help="where to put the plots")
 parser.add_argument("--outstatdir", type=str, help="where to put the marge and like statistics")
 parser.add_argument("--plottype", type=str, help="image extension (eps, png, ...)")
-parser.add_argument("--datafor", type=str, nargs='+', help="output marginalized probality for the named parameters")
+parser.add_argument("--datafor", type=str, nargs='+', help="output marginalized probality for the named parameters 'p1', 'p2',...")
+parser.add_argument("--data2Dfor", type=iob.split_strings, nargs='+', help="output 2D marginalized probality for the named lists of two parameters 'p1,p2' 'p3,p4'... ")
 parser.add_argument("--datadir", type=str, help="where to dump the marginalized probabilities")
 parser.add_argument("--bayestats", action="store_true", help="whether to compute the global information gain (anesthetic)")
 
@@ -42,6 +43,8 @@ parser.add_argument("--bayestats", action="store_true", help="whether to compute
 
 
 pargs = parser.parse_args()
+
+print('pargs ',pargs)
 
 rootname = 'bayesinf_' + pargs.name
 
@@ -163,7 +166,21 @@ if pargs.datafor is not None:
             raise Exception('density not found!')
         
 
+#### marginalized 2D distribution
 
+if pargs.data2Dfor is not None:
+    print('Getting marginalized 2D distribution...')
+
+    for param in pargs.data2Dfor:
+        print ("tesT ",param[0],param[1])
+        density2D = mc.get2DDensityGridData(param[0],param[1],get_density=False,meanlikes=False)
+        if density2D is not None:
+            filename = datadir + rootname + '_p_' + param[0] + '_' + param[1] + '.dat'
+            iob.save_probability_2d(filename,density2D.x,density2D.y,density2D.P)
+            print('saved as: ',filename)
+        else:
+            print('parameters are: ',param)
+            raise Exception('density2D not found!')
 
 #### plots
 

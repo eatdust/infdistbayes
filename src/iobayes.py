@@ -1,6 +1,6 @@
 #   This file is part of infdistbayes
 #
-#   Copyright (C) 2021-2023 C. Ringeval
+#   Copyright (C) 2021-2024 C. Ringeval
 #   
 #   infdistbayes is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -17,6 +17,11 @@
 
 import numpy as np
 from scipy import integrate
+
+
+def split_strings(parsed):
+    return parsed.split(',')
+
 
 def load_bayesdist(filename,oldtype=False):
     distoldtype = np.dtype([('Name', np.unicode_, 60),
@@ -95,10 +100,19 @@ def load_and_normalize_probability(filename):
 
 
 def load_xy(filename):
-    x,y = np.loadtxt(filename,unpack=True,usecols=[0,1])    
+    x,y = np.loadtxt(filename,unpack=True,usecols=[0,1])
     return x,y
+
+def load_xyz(filename):
+    x,y,z = np.loadtxt(filename,unpack=True,usecols=[0,1,2])
+    return x,y,z
 
 
 def save_probability_1d(filename,x,P):
     todump = np.column_stack([x,P])
     np.savetxt(filename,todump)
+
+
+def save_probability_2d(filename,x,y,P):
+    todump = np.column_stack([x,y,P])
+    np.savetxt(filename,todump)    
