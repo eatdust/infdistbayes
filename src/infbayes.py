@@ -172,10 +172,9 @@ if pargs.data2Dfor is not None:
     print('Getting marginalized 2D distribution...')
 
     for param in pargs.data2Dfor:
-        print ("tesT ",param[0],param[1])
         density2D = mc.get2DDensityGridData(param[0],param[1],get_density=False,meanlikes=False)
         if density2D is not None:
-            filename = datadir + rootname + '_p_' + param[0] + '_' + param[1] + '.dat'
+            filename = datadir + rootname + '_2D_' + param[0] + '_' + param[1] + '.dat'
             iob.save_probability_2d(filename,density2D.x,density2D.y,density2D.P)
             print('saved as: ',filename)
         else:
