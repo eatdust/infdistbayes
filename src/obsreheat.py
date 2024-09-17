@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 import iobayes as iob
 import kldivergence as kl
 import reheatfigs as rfig
-import postfigs as pfig
 import argparse
 import os
 
@@ -363,14 +362,3 @@ if (param == 'eps3'):
                         modelname=modelname,cminmax=[-0.2,0.2])
   
 
-if (param == 'alpha'):
-  units = np.ones(nmodel)/nmodel
-  ylabelname = r'$P\left(\alpha_\mathrm{S}|\mathcal{D}\right)$'
-  titlename = 'Normalized posterior distribution (model space)'
-  pfig.create_1d_figure(name='posteriors',distrib=posteriors,weight=proba,xmin=-0.0025,xmax=0.0005,
-                        xlabelname=paramtexname,ylabelname=ylabelname,titlename=titlename,formatname=formatname,save=True)
-  titlename = 'Normalized prior distribution (model space)'
-  ylabelname = r'$\pi\left(\alpha_\mathrm{S}\right)$'
-  pfig.create_1d_figure(name='priors',distrib=priors,weight=units,xmin=-0.01,xmax=0.003,ymax=800,
-                        xlabelname=paramtexname,ylabelname=ylabelname,titlename=titlename,formatname=formatname,save=True)
-  

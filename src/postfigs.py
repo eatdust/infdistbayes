@@ -42,7 +42,8 @@ def finterpsum(x,flist):
             
 
 def create_1d_figure(name,distrib,weight,xmin=None,xmax=None,ymax=None,
-                     xlabelname=None,ylabelname=None,titlename=None,formatname='png',save=False):
+                     xlabelname=None,ylabelname=None,titlename=None,formatname='png',
+                     save=False,nsave=100000):
 
 
     set_figure_params(dpi=200)
@@ -66,6 +67,7 @@ def create_1d_figure(name,distrib,weight,xmin=None,xmax=None,ymax=None,
         y = p[1]
         w = weight[i]
         xsup = [min(x),max(x)]
+        print("xsub= ",xsup)
         f = sp.interpolate.interp1d(x,y,kind='linear',bounds_error=False,fill_value=0.0)
 
         fys.append( [f,w] )
@@ -114,9 +116,6 @@ def create_1d_figure(name,distrib,weight,xmin=None,xmax=None,ymax=None,
 
 
     if save:
-        minf=-0.01
-        pinf = 0.01
-        nsave = 100000
-        xsave = np.linspace(max(minf,min(xpoints)),min(pinf,max(xpoints)),nsave)
+        xsave = np.linspace(xmin,xmax,nsave)
         ywsave = finterpsum(xsave,fys)
         iob.save_probability_1d(name + '.dat',xsave,ywsave)
