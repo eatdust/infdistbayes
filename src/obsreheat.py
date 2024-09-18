@@ -61,9 +61,12 @@ else:
   param = 'lnRreh'
 
 if pargs.paramTeXname is not None:
-  paramtexname = pargs.paramTeXname
+    paramtexname = pargs.paramTeXname
 else:
-  paramtexname = r'$\left\langle \ln R_{\mathrm{reh}} \right\rangle$'
+    if (param == 'lnRreh'):
+        paramtexname = r'$\left\langle \ln R_{\mathrm{reh}} \right\rangle$'
+    else:
+        paramtexname = r'$\left\langle p \right\rangle$'
 
 
 if pargs.nulldir is not None:

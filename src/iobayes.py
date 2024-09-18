@@ -92,6 +92,15 @@ def load_likestats(filename,**kwargs):
 
     return likestats
 
+def save_probability_1d(filename,x,P):
+    todump = np.column_stack([x,P])
+    np.savetxt(filename,todump)
+
+
+def load_xy(filename):
+    x,y = np.loadtxt(filename,unpack=True,usecols=[0,1])
+    return x,y
+
 
 def load_and_normalize_probability(filename):
     x,y = np.loadtxt(filename,unpack=True,usecols=[0,1])
@@ -99,20 +108,18 @@ def load_and_normalize_probability(filename):
     return x,y/norm,y
 
 
-def load_xy(filename):
-    x,y = np.loadtxt(filename,unpack=True,usecols=[0,1])
-    return x,y
+def save_density_2d(filename,P):
+    np.savetxt(filename,P)
 
-def load_xyz(filename):
-    x,y,z = np.loadtxt(filename,unpack=True,usecols=[0,1,2])
-    return x,y,z
-
-
-def save_probability_1d(filename,x,P):
-    todump = np.column_stack([x,P])
+    
+def save_params_2d(filename,x,y):
+    todump = np.column_stack([x,y])
     np.savetxt(filename,todump)
+    
 
-
-def save_probability_2d(filename,x,y,P):
-    todump = np.column_stack([x,y,P])
-    np.savetxt(filename,todump)    
+def load_and_normalize_probability_2d(filedensity,fileparam):
+    x,y = load_xy(fileparam)
+    P = np.loadtxt(filedensity)
+    norm = integrate.simps(integrate.simps(P,y),x)
+#    print("norm= ",norm)
+    return x,y,P/norm,P

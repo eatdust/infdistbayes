@@ -1,6 +1,6 @@
 #   This file is part of infdistbayes
 #
-#   Copyright (C) 2021-2023 C. Ringeval
+#   Copyright (C) 2021-2024 C. Ringeval
 #   
 #   infdistbayes is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -174,9 +174,14 @@ if pargs.data2Dfor is not None:
     for param in pargs.data2Dfor:
         density2D = mc.get2DDensityGridData(param[0],param[1],get_density=False,meanlikes=False)
         if density2D is not None:
-            filename = datadir + rootname + '_2D_' + param[0] + '_' + param[1] + '.dat'
-            iob.save_probability_2d(filename,density2D.x,density2D.y,density2D.P)
-            print('saved as: ',filename)
+            fileparams = datadir + rootname + '_pp_' + param[0] + '_' + param[1] + '.dat'
+            iob.save_params_2d(fileparams,density2D.x,density2D.y)
+            print('2D params saved as: ',fileparams)
+
+            filedensity = datadir + rootname + '_2D_' + param[0] + '_' + param[1] + '.dat'
+            iob.save_density_2d(filedensity,density2D.P)
+            print('density2D saved as: ',filedensity)
+
         else:
             print('parameters are: ',param)
             raise Exception('density2D not found!')

@@ -21,7 +21,7 @@ import numpy as np
 import scipy as sp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-
+from mpl_toolkits.mplot3d import axes3d
 
 def set_figure_params(dpi=None):
 
@@ -38,6 +38,14 @@ def finterpsum(x,flist):
         y = y+f(x)*w
 
     return y
+
+
+def finterpsum_2d(x,y,flist):
+    z = 0.0
+    for f,w in flist:
+        z = z+f(x,y)*w
+
+    return z
 
             
 
@@ -67,7 +75,7 @@ def create_1d_figure(name,distrib,weight,xmin=None,xmax=None,ymax=None,
         y = p[1]
         w = weight[i]
         xsup = [min(x),max(x)]
-        print("xsub= ",xsup)
+
         f = sp.interpolate.interp1d(x,y,kind='linear',bounds_error=False,fill_value=0.0)
 
         fys.append( [f,w] )
@@ -119,3 +127,103 @@ def create_1d_figure(name,distrib,weight,xmin=None,xmax=None,ymax=None,
         xsave = np.linspace(xmin,xmax,nsave)
         ywsave = finterpsum(xsave,fys)
         iob.save_probability_1d(name + '.dat',xsave,ywsave)
+
+
+
+def create_2d_figure(name,distrib2D,weight,xmin=None,xmax=None,ymin=None, ymax=None,
+                     xlabelname=None,ylabelname=None,clabelname=None,titlename=None,formatname='png'):
+
+
+    set_figure_params(dpi=200)
+    
+    fslabel = 12
+    
+    npts = 50
+    nlevels = 50
+
+    nd = len(distrib2D)
+    nw = len(weight)
+
+    if (nd != nw):
+        raise ValueError("distrib and weight of unequal length!")
+    
+
+    i=0
+    fPs=[]
+    xpoints = []
+    ypoints= []
+    for p in distrib2D:
+        x = p[0]
+        y = p[1]
+        z = p[2]
+        w = weight[i]
+        xsup = [min(x),max(x)]
+        ysup = [min(y),max(y)]
+        
+        f = sp.interpolate.RectBivariateSpline(x,y,z,kx=1,ky=1)
+        
+        fPs.append( [f,w] )
+
+        xpoints.append(xsup[0])
+        xpoints.append(xsup[1])
+        ypoints.append(ysup[0])
+        ypoints.append(ysup[1])
+        
+        i+=1
+    
+    
+    xpoints = np.sort(xpoints)
+    ypoints = np.sort(ypoints)
+    
+    fig, ax0 = plt.subplots()
+
+
+    #super-slow crazy consistency check, this should be unity. Mind that dblquad integrate f(y,x)...
+#    integval,integerr = sp.integrate.dblquad(finterpsum_2d,min(ypoints),max(ypoints),
+#                                             min(xpoints),max(xpoints), args=(fPs,))
+#    print("integ= err= ",integval,integerr)
+
+    
+
+    if xmin is None:
+        xmin = min(xpoints)
+
+    if xmax is None:
+        xmax = max(xpoints)
+
+    if ymin is None:
+        ymin = min(ypoints)
+
+    if ymax is None:
+        ymax = max(ypoints)        
+    
+    ax0.set_xlabel(xlabelname, fontsize=fslabel)
+    ax0.set_ylabel(ylabelname,fontsize=fslabel)
+    ax0.set_title(titlename,fontsize=fslabel)
+    
+    xgrid = np.linspace(xmin,xmax,npts)
+    ygrid = np.linspace(ymin,ymax,npts)
+    Pwgrid = finterpsum_2d(xgrid,ygrid,fPs)
+
+#    print("xgrid= ",xgrid)
+#    print("ygrid= ",ygrid)
+#    print("Pwgrid= ",Pwgrid)
+    
+    cf = ax0.contourf(xgrid,ygrid,Pwgrid,levels=nlevels)
+    cbar = fig.colorbar(cf)
+    cbar.ax.set_ylabel(clabelname)
+    
+#setting bbox for postscript messes the colorbar        
+    if (formatname == 'eps' or formatname == 'ps'):
+        plt.savefig(name + '.' +formatname, format=formatname)
+    else:
+        plt.savefig(name + '.' +formatname, format=formatname, bbox_inches='tight')
+
+
+
+
+
+
+
+
+        
