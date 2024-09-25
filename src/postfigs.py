@@ -21,7 +21,7 @@ import numpy as np
 import scipy as sp
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import axes3d
+import getdist.densities as gd
 
 def set_figure_params(dpi=None):
 
@@ -51,15 +51,13 @@ def finterpsum_2d(x,y,flist):
 
 def create_1d_figure(name,distrib,weight,xmin=None,xmax=None,ymax=None,
                      xlabelname=None,ylabelname=None,titlename=None,formatname='png',
-                     save=False,nsave=100000):
+                     npts=10000,save=False,nsave=100000):
 
 
     set_figure_params(dpi=200)
     
     fslabel = 12
     
-    npts = 10000
-
     nd = len(distrib)
     nw = len(weight)
 
@@ -131,16 +129,14 @@ def create_1d_figure(name,distrib,weight,xmin=None,xmax=None,ymax=None,
 
 
 def create_2d_figure(name,distrib2D,weight,xmin=None,xmax=None,ymin=None, ymax=None,
-                     xlabelname=None,ylabelname=None,clabelname=None,titlename=None,formatname='png'):
+                     xlabelname=None,ylabelname=None,clabelname=None,titlename=None,
+                     formatname='png',npts=100,nlevels=100,clevels=[0.98,0.95,0.68]):
 
 
     set_figure_params(dpi=200)
     
     fslabel = 12
     
-    npts = 50
-    nlevels = 50
-
     nd = len(distrib2D)
     nw = len(weight)
 
@@ -205,13 +201,23 @@ def create_2d_figure(name,distrib2D,weight,xmin=None,xmax=None,ymin=None, ymax=N
     ygrid = np.linspace(ymin,ymax,npts)
     Pwgrid = finterpsum_2d(xgrid,ygrid,fPs)
 
+        
 #    print("xgrid= ",xgrid)
 #    print("ygrid= ",ygrid)
 #    print("Pwgrid= ",Pwgrid)
-    
+
+    gdP2D = gd.Density2D(xgrid,ygrid,Pwgrid)
+    gdlevels = gdP2D.getContourLevels(contours=clevels)
+#    print("contour levels ",gdlevels)
+#    print("should be unity ",gdP2D.integrate(Pwgrid))
+
     cf = ax0.contourf(xgrid,ygrid,Pwgrid,levels=nlevels)
+    ccl = ax0.contour(xgrid,ygrid,Pwgrid,levels=gdlevels,colors=['grey','lightsalmon','cyan'])
+
     cbar = fig.colorbar(cf)
     cbar.ax.set_ylabel(clabelname)
+    cbar.add_lines(ccl)
+
     
 #setting bbox for postscript messes the colorbar        
     if (formatname == 'eps' or formatname == 'ps'):
