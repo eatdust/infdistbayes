@@ -1,5 +1,7 @@
 # Infdistbayes: analysis tools for Bayaspic
 
+---
+
 ### Summary
 
 Infdistbayes is a set of python programs and modules to analyse the
@@ -12,6 +14,7 @@ based on [GetDist](https://pypi.org/project/getdist/),
 [Matplotlib](https://pypi.org/project/matplotlib/) that should be
 installed on your system.
 
+---
 
 ### Usage
 
@@ -43,4 +46,6 @@ meaningfull statistics in model space.
 The directory src/ also contains various python programs to plot these
 statistics. They require the "bayesdist.log" file to be present
 (check-out their command-line help for more information).
+
+See [infdistbayes-output]() for an example.
 
