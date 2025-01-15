@@ -47,5 +47,5 @@ The directory src/ also contains various python programs to plot these
 statistics. They require the "bayesdist.log" file to be present
 (check-out their command-line help for more information).
 
-See [infdistbayes-output]() for an example.
+See [infdistbayes-output](https://curl.irmp.ucl.ac.be/~chris/upload/infdistbayes-output/) for an example.
 
