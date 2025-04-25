@@ -85,7 +85,7 @@ fi
 #command to start infbayes analysis of the samples
 export BINDIST='python '$EXECDIR'infbayes.py'
 export OPTDIST=' --distfile '$DISTFILE' --chaindir '$CHAINDIR' --outplotdir '$PLOTDIR
-export OPTDIST=$OPTDIST' --outstatdir '$STATDIR' --datafor '$DATAPARAMLIST' --data2Dfor '$DATA2DPARAMLIST'--datadir '$DATADIR
+export OPTDIST=$OPTDIST' --outstatdir '$STATDIR' --datafor '$DATAPARAMLIST' --data2Dfor '$DATA2DPARAMLIST' --datadir '$DATADIR
 if [ $whichD == 1 ]; then
     export OPTDIST=$OPTDIST' --bayestats '
 fi
