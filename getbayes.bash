@@ -38,7 +38,7 @@ export EXECDIR=$CURRENTDIR/'src/'
 export DATAPARAMLIST='lnRreh'
 
 #compute 2D marginalized distribution for these parameters
-export DATA2DPARAMLIST='lnRhoReh,wreh'
+#export DATA2DPARAMLIST='lnRhoReh,wreh'
 
 #use Bayesian Model Complexity (0) or Bayesian Model Dimensionality (1).
 #The latter is computed using the anesthetic package and this also
@@ -47,7 +47,7 @@ whichD=1
 
 #use Multinest evidences(0), INS evidences (1) or polychord evidences
 #(2) [(-1) for obsoleted multinest versions]
-whichZ=0
+whichZ=2
 
 export OUTDIR='./output'
 export OUTFILE='bayesdist.log'
@@ -85,7 +85,11 @@ fi
 #command to start infbayes analysis of the samples
 export BINDIST='python '$EXECDIR'infbayes.py'
 export OPTDIST=' --distfile '$DISTFILE' --chaindir '$CHAINDIR' --outplotdir '$PLOTDIR
-export OPTDIST=$OPTDIST' --outstatdir '$STATDIR' --datafor '$DATAPARAMLIST' --data2Dfor '$DATA2DPARAMLIST' --datadir '$DATADIR
+export OPTDIST=$OPTDIST' --outstatdir '$STATDIR' --datafor '$DATAPARAMLIST' --datadir '$DATADIR
+if [[ ! -z $DATA2DPARAMLIST ]]; then
+    export OPTDIST=$OPTDIST' --data2Dfor '$DATA2DPARAMLIST
+fi
+
 if [ $whichD == 1 ]; then
     export OPTDIST=$OPTDIST' --bayestats '
 fi

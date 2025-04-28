@@ -22,7 +22,6 @@ from scipy import integrate
 def split_strings(parsed):
     return parsed.split(',')
 
-
 def load_bayesdist(filename,oldtype=False):
     distoldtype = np.dtype([('Name', np.unicode_, 60),
                      ('Nparams',np.dtype(int)),

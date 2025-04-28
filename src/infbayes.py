@@ -201,7 +201,9 @@ params2D = params2D + [['lnA','lnM'],['logr','ns'],['lnRhoEnd','lnRreh'],
 
 if ('eps2' in params1D) and ('eps3' in params1D):
     params2D = params2D + [['eps2','logeps'],['eps3','logeps'],['eps2','eps3']]
-    
+
+if pargs.data2Dfor is not None:
+    params2D = params2D + pargs.data2Dfor
 
 print('params2D= ',params2D)
 

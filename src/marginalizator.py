@@ -32,9 +32,12 @@ parser.add_argument("bayesdistname", help="Bayesian evidence file name")
 
 parser.add_argument("--rootname", type=str, help="root name of all read files (bayesinf_)")
 parser.add_argument("--paramname", type=str, help="model space marginalization for the named parameter 'p'")
+parser.add_argument("--parambound", type=float, nargs=2, help="min/max values for the parameter 'p', as 'pmin pmax'")
 parser.add_argument("--paramTeXname", type=str, help="LaTeX name of the parameter (for plot)")
 parser.add_argument("--param2Dname", type=iob.split_strings,
                     help="model space 2D marginalization for the couple of parameters 'p1','p2'")
+parser.add_argument("--param2Dbound", nargs=4, type=float,
+                    help="min/max values for the 2D parameters 'p1','p2' as 'p1min p1max p2min p2max'")
 parser.add_argument("--param2DTeXname", type=iob.split_strings,
                     help="LaTeX name of the couple of parameters '$p_1$','$p_2$'")
 parser.add_argument("--nulldir", type=str, help="where to read the marginalized priors")
@@ -55,6 +58,11 @@ if pargs.paramname is not None:
 else:
     param = 'lnRreh'
 
+if pargs.parambound is not None:
+    parambound = pargs.parambound
+else:
+    parambound = None
+    
 if pargs.paramTeXname is not None:
     paramtexname = pargs.paramTeXname
 else:
@@ -69,6 +77,11 @@ if pargs.param2Dname is not None:
 else:
     param2D = None 
 
+if pargs.param2Dbound is not None:
+    param2Dbound = pargs.param2Dbound
+else:
+    param2Dbound = None 
+    
 if pargs.param2DTeXname is not None:
     param2Dtexname = pargs.param2DTeXname
 else:
@@ -217,6 +230,13 @@ if (param == 'lnRhoReh'):
     xminpost = -187
     xmaxpost = 0.0
     paramtexname = r'$\ln \rho_\mathrm{reh}$'
+
+if (parambound is not None):
+    xminprior = parambound[0]
+    xmaxprior = parambound[1]
+    xminpost = parambound[0]
+    xmaxpost = parambound[1]
+    
     
 units = np.ones(nmodel)/nmodel
 
@@ -256,14 +276,27 @@ if param2D is not None:
         ylabelname = None
         clabelpriorname = None
         clabelpostname = None
+
+    if param2Dbound is not None:
+        xmin = param2Dbound[0]
+        xmax = param2Dbound[1]
+        ymin = param2Dbound[2]
+        ymax = param2Dbound[3]
+    else:
+        xmin = None
+        xmax = None
+        ymin = None
+        ymax = None
         
     titlename = 'Normalized prior distribution (model space)'
     pfig.create_2d_figure(name='priors_2D_'+param2D[0]+'_'+param2D[1],distrib2D=priors2D,weight=units,
+                          xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax,
                           xlabelname=xlabelname,ylabelname=ylabelname,clabelname=clabelpriorname,
                           titlename=titlename,formatname=formatname)
 
     
     titlename = 'Normalized posterior distribution (model space)'
     pfig.create_2d_figure(name='posteriors_2D_'+param2D[0]+'_'+param2D[1],distrib2D=posteriors2D,weight=proba,
+                          xmin=xmin,xmax=xmax,ymin=ymin,ymax=ymax,
                           xlabelname=xlabelname,ylabelname=ylabelname,clabelname=clabelpostname,
                           titlename=titlename,formatname=formatname)
